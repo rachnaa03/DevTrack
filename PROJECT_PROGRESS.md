@@ -9,7 +9,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Design Technology Stack Specification - [TECH_STACK.md](file:///d:/workspace/DevTrack/docs/design/TECH_STACK.md)
 - [x] Design System Architecture - [ARCHITECTURE.md](file:///d:/workspace/DevTrack/docs/architecture/ARCHITECTURE.md)
 - [x] Define Domain Model - [DOMAIN_MODEL.md](file:///d:/workspace/DevTrack/docs/architecture/DOMAIN_MODEL.md)
-- [/] Design Database Schema (ERD) - [DATABASE_DESIGN.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_DESIGN.md) *(Placeholder created, to be completed in design phase)*
+- [x] Design Database Schema (ERD) - [DATABASE_DESIGN.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_DESIGN.md)
 - [x] Define Database Indexing Strategy - [DATABASE_INDEXING.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_INDEXING.md)
 - [/] Define API Endpoint Contracts - [API_SPECIFICATION.md](file:///d:/workspace/DevTrack/docs/design/API_SPECIFICATION.md) *(Placeholder created, to be completed in design phase)*
 - [x] Design Project Implementation Roadmap - [IMPLEMENTATION_ROADMAP.md](file:///d:/workspace/DevTrack/docs/design/IMPLEMENTATION_ROADMAP.md)
