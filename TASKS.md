@@ -8,7 +8,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 0.2** | Completed | Design Technology Stack Specification | `2dd4fad` | Initial version completed. |
 | **Task 0.3** | Completed | Design System Architecture | `2dd4fad` | Initial version completed. |
 | **Task 0.4** | Completed | Design Database Schema (ERD) | `c343e15` | Complete database specification document created. |
-| **Task 0.5** | In Progress | Define API Endpoint Contracts | *N/A* | Placeholder document created in `docs/design/API_SPECIFICATION.md`. |
+| **Task 0.5** | Completed | Define API Endpoint Contracts | `85b027f` | Complete REST API specification document created. |
 | **Task 1.1** | Pending | FastAPI App Initialization & Directory Setup | *Pending* | |
 | **Task 1.2** | Pending | Environment Variable Configuration | *Pending* | |
 | **Task 1.3** | Pending | PostgreSQL Connection & SQLAlchemy Engine Setup | *Pending* | |

@@ -11,7 +11,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Define Domain Model - [DOMAIN_MODEL.md](file:///d:/workspace/DevTrack/docs/architecture/DOMAIN_MODEL.md)
 - [x] Design Database Schema (ERD) - [DATABASE_DESIGN.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_DESIGN.md)
 - [x] Define Database Indexing Strategy - [DATABASE_INDEXING.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_INDEXING.md)
-- [/] Define API Endpoint Contracts - [API_SPECIFICATION.md](file:///d:/workspace/DevTrack/docs/design/API_SPECIFICATION.md) *(Placeholder created, to be completed in design phase)*
+- [x] Define API Endpoint Contracts - [API_SPECIFICATION.md](file:///d:/workspace/DevTrack/docs/design/API_SPECIFICATION.md)
 - [x] Design Project Implementation Roadmap - [IMPLEMENTATION_ROADMAP.md](file:///d:/workspace/DevTrack/docs/design/IMPLEMENTATION_ROADMAP.md)
 
 ### 2. Backend Foundation
