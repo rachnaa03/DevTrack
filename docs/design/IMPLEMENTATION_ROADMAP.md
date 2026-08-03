@@ -8,7 +8,7 @@ This document outlines the detailed roadmap for designing, implementing, testing
 ---
 
 ## 📅 Project Folder Structure Reference
-We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/workspace/DevTrack/docs/TECH_STACK.md):
+We will adhere to the folder layout specified in [TECH_STACK.md](file:///d:/workspace/DevTrack/docs/design/TECH_STACK.md):
 *   `app/api/`: API Endpoint Routers (auth, profile, dashboard, reports).
 *   `app/core/`: Application settings, DB session pools, security/JWT helpers, logging configs.
 *   `app/models/`: SQLAlchemy ORM database models.
@@ -50,23 +50,23 @@ We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/work
 #### Tasks
 *   **Task 0.1: Gather Requirements & Complete SRS**
     *   *Objective:* Finalize scope, requirements, assumptions, and constraints.
-    *   *Description:* Write and finalize the `docs/SRS.md` file.
+    *   *Description:* Write and finalize the `docs/design/SRS.md` file.
     *   *Difficulty:* Easy
     *   *Dependencies:* None
-    *   *Expected Deliverables:* Completed `docs/SRS.md` file.
+    *   *Expected Deliverables:* Completed `docs/design/SRS.md` file.
     *   *Suggested Commit:* `docs: write software requirements specification`
     *   *Acceptance Criteria:* Document covers all functional/non-functional requirements and contains user-approved semantic versions.
 *   **Task 0.2: Design Technology Stack Specification**
     *   *Objective:* Detail libraries, frameworks, database, and rationale.
-    *   *Description:* Write and finalize the `docs/TECH_STACK.md` file.
+    *   *Description:* Write and finalize the `docs/design/TECH_STACK.md` file.
     *   *Difficulty:* Easy
     *   *Dependencies:* Task 0.1
-    *   *Expected Deliverables:* Completed `docs/TECH_STACK.md` file.
+    *   *Expected Deliverables:* Completed `docs/design/TECH_STACK.md` file.
     *   *Suggested Commit:* `docs: finalize technology stack specification`
     *   *Acceptance Criteria:* Includes explicit Decision Records (FastAPI vs. Flask, SQLAlchemy vs. SQLModel, etc.) and Folder Structure.
 *   **Task 0.3: Design System Architecture**
     *   *Objective:* Define component relationships, data flow, and layers.
-    *   *Description:* Create `docs/ARCHITECTURE.md` explaining modules and async execution.
+    *   *Description:* Create `docs/architecture/ARCHITECTURE.md` explaining modules and async execution.
     *   *Difficulty:* Medium
     *   *Dependencies:* Task 0.2
     *   *Expected Deliverables:* System architecture document.
@@ -74,7 +74,7 @@ We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/work
     *   *Acceptance Criteria:* Flowchart shows the exact asynchronous background synchronization cycle.
 *   **Task 0.4: Design Database Schema (ERD)**
     *   *Objective:* Model database tables, relationships, types, and indexes.
-    *   *Description:* Create `docs/DATABASE_DESIGN.md` including table definitions.
+    *   *Description:* Create `docs/architecture/DATABASE_DESIGN.md` including table definitions.
     *   *Difficulty:* Medium
     *   *Dependencies:* Task 0.3
     *   *Expected Deliverables:* Detailed ERD layout document.
@@ -82,7 +82,7 @@ We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/work
     *   *Acceptance Criteria:* Defines users, profiles, snapshots, history, scores, insights, recommendations, and reports tables.
 *   **Task 0.5: Define API Endpoint Contracts**
     *   *Objective:* Formulate exact request payloads, response bodies, and error response schemas.
-    *   *Description:* Create `docs/API_SPECIFICATION.md` defining endpoints for auth, profile, and dashboard.
+    *   *Description:* Create `docs/design/API_SPECIFICATION.md` defining endpoints for auth, profile, and dashboard.
     *   *Difficulty:* Medium
     *   *Dependencies:* Task 0.4
     *   *Expected Deliverables:* API Endpoint design contracts.
@@ -810,7 +810,7 @@ We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/work
     *   *Acceptance Criteria:* Fresh local setups can be completed using only instructions from README.
 *   **Task 17.2: Create Database ERD and Schema Description (MVP)**
     *   *Objective:* Map schemas.
-    *   *Description:* Document relations, indexing targets, and column tables in `docs/DATABASE_DESIGN.md`.
+    *   *Description:* Document relations, indexing targets, and column tables in `docs/architecture/DATABASE_DESIGN.md`.
     *   *Difficulty:* Easy
     *   *Dependencies:* Task 0.4
     *   *Expected Deliverables:* DB architecture document.
@@ -818,7 +818,7 @@ We will adhere to the folder layout specified in [TECH_STACK.md](file:///D:/work
     *   *Acceptance Criteria:* Guide outlines every database table, foreign key, index rationale, and data type.
 *   **Task 17.3: Document Production Deployment Steps (Post-MVP)**
     *   *Objective:* VPS hosting parameters.
-    *   *Description:* Detail environment configurations, reverse proxies (Nginx), and database parameters in `docs/DEPLOYMENT.md`.
+    *   *Description:* Detail environment configurations, reverse proxies (Nginx), and database parameters in `docs/design/DEPLOYMENT.md`.
     *   *Difficulty:* Easy
     *   *Dependencies:* Phase 15
     *   *Expected Deliverables:* Production deployment guide.

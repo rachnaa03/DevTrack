@@ -11,7 +11,7 @@ This document specifies the non-functional quality attributes (architectural -il
 *   **Target Latency:** All GET requests (dashboard summaries, historical charts, user profile data) must respond in **under 200ms** under normal server load.
 *   **How it is achieved:**
     *   **Asynchronous Processing:** Network-I/O bound sync tasks are offloaded to background threads. The API reads data directly from the local PostgreSQL database, eliminating real-time API calls.
-    *   **Query Index Seeks:** Crucial read queries target database columns optimized with custom B-Tree indexes (see [DATABASE_INDEXING.md](file:///D:/workspace/DevTrack/docs/DATABASE_INDEXING.md)).
+    *   **Query Index Seeks:** Crucial read queries target database columns optimized with custom B-Tree indexes (see [DATABASE_INDEXING.md](file:///d:/workspace/DevTrack/docs/architecture/DATABASE_INDEXING.md)).
 
 ---
 

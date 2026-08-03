@@ -176,9 +176,31 @@ DevTrack/
 │   └── services/               # Scoring & recommendation unit tests
 │
 ├── docs/                       # Project Design and Requirements Docs
-│   ├── SRS.md                  # Software Requirements Specification
-│   ├── TECH_STACK.md           # Technology Stack
-│   └── ROADMAP.md              # Project Implementation Roadmap
+│   ├── architecture/           # System Architecture & Technical Specifications
+│   │   ├── ARCHITECTURE.md
+│   │   ├── DOMAIN_MODEL.md
+│   │   ├── DATABASE_DESIGN.md
+│   │   ├── DATABASE_INDEXING.md
+│   │   ├── FUTURE_ARCHITECTURE.md
+│   │   └── QUALITY_ATTRIBUTES.md
+│   ├── design/                 # Requirements & Functional Specifications
+│   │   ├── SRS.md
+│   │   ├── TECH_STACK.md
+│   │   ├── IMPLEMENTATION_ROADMAP.md
+│   │   ├── CONFIGURATION.md
+│   │   ├── CODING_STANDARDS.md
+│   │   ├── ERROR_HANDLING.md
+│   │   └── API_SPECIFICATION.md
+│   ├── adr/                    # Architectural Decision Records
+│   │   ├── 001-fastapi.md
+│   │   ├── 002-postgresql.md
+│   │   ├── 003-sqlalchemy.md
+│   │   ├── 004-jwt-authentication.md
+│   │   ├── 005-historical-snapshots.md
+│   │   ├── 006-api-first.md
+│   │   └── 007-platform-adapters.md
+│   ├── diagrams/               # Visual Architecture Diagrams
+│   └── images/                 # Embedded Design Images
 │
 ├── alembic/                    # Database Schema Migration folder
 ├── .env                        # Local Secret environment variables
