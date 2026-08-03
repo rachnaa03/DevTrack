@@ -10,7 +10,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 0.4** | Completed | Design Database Schema (ERD) | `c343e15` | Complete database specification document created. |
 | **Task 0.5** | Completed | Define API Endpoint Contracts | `85b027f` | Complete REST API specification document created. |
 | **Task 1.1** | Completed | FastAPI App Initialization & Directory Setup | `b5d7f2d` | FastAPI initialized with uvicorn and app directory layout. |
-| **Task 1.2** | Pending | Environment Variable Configuration | *Pending* | |
+| **Task 1.2** | Completed | Environment Variable Configuration | `ac37bc6` | Settings configuration module created with Pydantic settings loading. |
 | **Task 1.3** | Pending | PostgreSQL Connection & SQLAlchemy Engine Setup | *Pending* | |
 | **Task 1.4** | Pending | Alembic Migration Initialization | *Pending* | |
 | **Task 1.5** | Pending | Structured Logging Configuration | *Pending* | |
