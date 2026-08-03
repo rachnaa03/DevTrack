@@ -1,141 +1,304 @@
-# DevTrack — Unified Developer Analytics Platform
+# DevTrack 🚀
 
-DevTrack is an API-first developer growth companion that transforms fragmented developer metrics into a single, unified analytical feed. By integrating with third-party developer platforms (such as GitHub and LeetCode), DevTrack tracks, analyzes, and scores coding consistency, problem-solving depth, and open-source impact to provide actionable growth recommendations.
+> **A Unified Developer Analytics Platform that helps developers measure, understand, and improve their coding journey.**
 
----
+DevTrack aggregates coding activity from platforms like **GitHub** and **LeetCode**, stores historical snapshots, analyzes developer growth, calculates a custom **Developer Score**, and generates actionable insights and recommendations through a modern analytics dashboard.
 
-## 🚀 Core Pipeline Flow
-
-```
-Collect (GitHub & LeetCode APIs)
-   ↓
-Store (Immutable JSONB snapshots)
-   ↓
-Analyze (Language share, streaks, topics)
-   ↓
-Score (Custom weighted Developer Score)
-   ↓
-Generate Insights (Comparative trend highlights)
-   ↓
-Generate Recommendations (Targeted practice tips)
-   ↓
-Track Long-Term Growth (Weekly retrospective reports)
-```
+Rather than treating GitHub and LeetCode as isolated platforms, DevTrack combines their data into a **single developer profile** that reflects overall technical growth over time.
 
 ---
 
-## 🛠 Technology Stack
+# ✨ Features
 
-### Backend Framework
-*   **FastAPI**: Async-first routing, automatic OpenAPI validation, and Swagger interface.
-*   **Python 3.11+**: Standard for data manipulation and analytics.
+## 🔐 Authentication & User Management
 
-### Database & Ingestions
-*   **PostgreSQL**: relational storage with native `JSONB` support.
-*   **SQLAlchemy 2.0+**: Asynchronous database query mappings.
-*   **Alembic**: Database schema migration tracker.
-*   **APScheduler**: In-process background job task scheduler.
-
-### Security & Validation
-*   **Pydantic v2.0+**: Robust boundary data validators.
-*   **JWT & Bcrypt**: Stateless session authorization and secure password hashing.
+- User Registration & Login
+- JWT Authentication
+- User Profile Management
+- Connect GitHub & LeetCode accounts
 
 ---
 
-## 📂 Folder Structure
+## 🔗 Platform Integrations
 
+### GitHub
+
+- User Profile
+- Repository Statistics
+- Programming Languages
+- Stars & Forks
+- Commit Activity
+- Contribution History
+
+### LeetCode
+
+- Problems Solved
+- Difficulty Distribution
+- Contest Rating
+- Acceptance Rate
+- Topic-wise Progress
+- Recent Activity
+
+---
+
+## 📊 Analytics Dashboard
+
+- Developer Overview
+- Coding Activity
+- GitHub Activity
+- Progress Charts
+- Language Distribution
+- Topic Distribution
+- Coding Consistency
+- Growth Trends
+
+---
+
+## ⭐ Developer Score
+
+A custom rule-based scoring system that evaluates a developer's overall growth using multiple metrics such as:
+
+- Coding Consistency
+- Problem Solving
+- Repository Quality
+- GitHub Activity
+- Contest Participation
+
+---
+
+## 🧠 Insights Engine
+
+DevTrack transforms raw statistics into meaningful observations.
+
+Examples:
+
+- Your Graph practice decreased by 40% this month.
+- GitHub activity increased for three consecutive weeks.
+- Medium problem solving improved significantly.
+
+---
+
+## 🎯 Recommendation Engine
+
+Generate personalized recommendations such as:
+
+- Practice Graph problems
+- Improve GitHub consistency
+- Solve more Medium problems
+- Participate in weekly contests
+
+---
+
+## 📈 Progress Tracking
+
+- Weekly Progress
+- Monthly Progress
+- Historical Growth
+- Coding Streaks
+- Milestones
+- Developer Timeline
+
+---
+
+# 🏗 System Pipeline
+
+```text
+GitHub API        LeetCode API
+        │
+        ▼
+Background Synchronization Service
+        │
+        ▼
+Historical Snapshots (PostgreSQL)
+        │
+        ▼
+Analytics Engine
+        │
+        ▼
+Developer Score Engine
+        │
+        ▼
+Insights Engine
+        │
+        ▼
+Recommendation Engine
+        │
+        ▼
+FastAPI REST API
+        │
+        ▼
+Frontend Dashboard
 ```
+
+---
+
+# 🛠 Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| Backend | FastAPI |
+| Language | Python 3.11+ |
+| Database | PostgreSQL |
+| ORM | SQLAlchemy 2.0 |
+| Migrations | Alembic |
+| Background Jobs | APScheduler |
+| Authentication | JWT + Bcrypt |
+| Validation | Pydantic v2 |
+| HTTP Client | HTTPX |
+| Frontend | React (MVP) |
+
+---
+
+# 📂 Project Structure
+
+```text
 DevTrack/
 │
-├── README.md                   # Project summary & execution guidelines
-├── PROJECT_PROGRESS.md         # Phase and roadmap progress tracker
-├── TASKS.md                    # Detailed atomic task logs
-├── CHANGELOG.md                # Project changelog (Keep a Changelog format)
+├── app/
+│   ├── api/
+│   ├── core/
+│   ├── models/
+│   ├── repositories/
+│   ├── schemas/
+│   ├── services/
+│   └── utils/
 │
-├── app/                        # Application source code
-│   ├── api/                    # Presentation layer (HTTP Routers)
-│   │   ├── auth/               # User signup and authentication endpoints
-│   │   ├── profile/            # Handles profile settings and handle links
-│   │   ├── dashboard/          # Summary metrics, charts, timeline feeds
-│   │   └── reports/            # Weekly retrospective reports endpoints
-│   │
-│   ├── core/                   # Shared system utilities (config, database, security)
-│   ├── models/                 # SQLAlchemy Declarative Models (Database tables)
-│   ├── schemas/                # Request/Response validation schemas
-│   ├── repositories/           # Database persistence operations (CRUD only)
-│   ├── services/               # Core business logic and platforms integrations
-│   │   ├── integrations/       # Platform Adapters (GitHub/LeetCode clients)
-│   │   ├── analytics/          # Progress metrics analyzers
-│   │   ├── scoring/            # Weighted score calculator
-│   │   ├── insights/           # Snapshot comparative logs engine
-│   │   ├── recommendations/    # Study recommendations generator
-│   │   └── scheduler/          # Background worker tasks
-│   │
-│   └── utils/                  # Stateless helpers
+├── docs/
+├── tests/
+├── alembic/
 │
-├── tests/                      # Pytest automated testing suite
-│   ├── api/                    # Router security and schema validation tests
-│   └── services/               # Score and analytics unit tests
-│
-├── docs/                       # Specifications and Design decisions
-│   ├── architecture/           # System design specifications
-│   ├── design/                 # Requirements and API contracts
-│   └── adr/                    # Architecture Decision Records
-│
-└── alembic/                    # Database migrations folder
+├── README.md
+├── requirements.txt
+└── .env.example
 ```
 
 ---
 
-## ⚙️ Local Installation & Setup
+# 🚀 Getting Started
 
-### 1. Prerequisites
-Ensure you have Python 3.11+ and PostgreSQL installed on your machine.
+## Clone the repository
 
-### 2. Set Up Virtual Environment
-Initialize a Python virtual environment and activate it:
 ```bash
-# Create virtual environment
+git clone https://github.com/your-username/DevTrack.git
+
+cd DevTrack
+```
+
+## Create a virtual environment
+
+```bash
 python -m venv .venv
+```
 
-# Activate (Windows PowerShell)
+### Windows
+
+```bash
 .venv\Scripts\Activate.ps1
+```
 
-# Activate (Linux / macOS)
+### Linux / macOS
+
+```bash
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
-Install all package requirements listed in `requirements.txt`:
+## Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Settings
-Create a `.env` file in the project root based on the provided template:
-```bash
-cp .env.example .env
+## Configure environment variables
+
+Create a `.env` file.
+
+Example:
+
+```env
+DATABASE_URL=postgresql+asyncpg://...
+JWT_SECRET_KEY=your-secret-key
 ```
-Fill in the values:
-*   `DATABASE_URL`: Your local asynchronous PostgreSQL connection string.
-*   `JWT_SECRET_KEY`: A cryptographically strong secret key.
 
----
+## Run the application
 
-## 🏃 Running the Application
-
-To boot the FastAPI application locally using Uvicorn:
 ```bash
 python -m uvicorn app.main:app --reload
 ```
-Once running, the interactive Swagger API documentation will be available at:
-👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
 
 ---
 
-## 🧪 Running Tests
+# 📖 API Documentation
 
-To run the Pytest suite:
+Once the server is running:
+
+Swagger UI
+
+```
+http://127.0.0.1:8000/docs
+```
+
+ReDoc
+
+```
+http://127.0.0.1:8000/redoc
+```
+
+---
+
+# 🧪 Running Tests
+
 ```bash
 pytest
 ```
+
+---
+
+# 📚 Documentation
+
+Detailed project documentation is available in the `docs/` directory.
+
+- Software Requirements Specification (SRS)
+- Architecture
+- Domain Model
+- Database Design
+- API Specification
+- Technology Stack
+- Implementation Roadmap
+- Architecture Decision Records (ADRs)
+
+---
+
+# 🚧 Current Status
+
+The project is currently under active development.
+
+Current focus:
+
+- ✅ Planning & Architecture
+- 🚧 Backend Foundation
+- ⏳ GitHub Integration
+- ⏳ LeetCode Integration
+- ⏳ Analytics Engine
+- ⏳ Developer Score
+- ⏳ Recommendation Engine
+- ⏳ Dashboard APIs
+- ⏳ Frontend Dashboard
+
+---
+
+# 🔮 Future Enhancements
+
+- Codeforces Integration
+- CodeChef Integration
+- HackerRank Integration
+- AI-powered Insights
+- Resume Analyzer
+- Placement Readiness Score
+- Email Reports
+- Browser Extension
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
