@@ -179,7 +179,7 @@ DevTrack/
 ## Clone the repository
 
 ```bash
-git clone https://github.com/your-username/DevTrack.git
+git clone https://github.com/rachnaa03/DevTrack.git
 
 cd DevTrack
 ```

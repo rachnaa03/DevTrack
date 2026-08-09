@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Status:** Approved  
-**Prepared By:** Antigravity (Senior Backend Engineer)  
+**Prepared By:** Rachana Gandla
 
 This document describes the schema design, entity relationship model, constraints, indexing strategies, and architectural patterns of the PostgreSQL database for the DevTrack platform.
 

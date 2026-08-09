@@ -20,3 +20,4 @@ We selected **Immutable Historical Snapshots** stored as distinct daily database
     *   Can be queried rapidly using standard SQL indexes.
 *   **Trade-offs:**
     *   Database storage footprint will grow linearly with the number of active users. To mitigate this, we schedule sync runs at moderate intervals (twice daily) and will implement data pruning or archive pipelines post-MVP if database size becomes a bottleneck.
+

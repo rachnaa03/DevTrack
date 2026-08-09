@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Status:** Approved  
-**Prepared By:** Antigravity (Senior Backend Engineer)  
+**Prepared By:** Rachana Gandla
 
 This document details the API endpoint contracts for the DevTrack platform under the versioned prefix `/api/v1`.
 
