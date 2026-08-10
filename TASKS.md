@@ -12,7 +12,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 1.1** | Completed | FastAPI App Initialization & Directory Setup | `b5d7f2d` | FastAPI initialized with uvicorn and app directory layout. |
 | **Task 1.2** | Completed | Environment Variable Configuration | `ac37bc6` | Settings configuration module created with Pydantic settings loading. |
 | **Task 1.3** | Completed | PostgreSQL Connection & SQLAlchemy Engine Setup | `6266ee5` | Async engine, sessionmaker, Base class, and get_db dependency created. |
-| **Task 1.4** | Pending | Alembic Migration Initialization | *Pending* | |
+| **Task 1.4** | Completed | Alembic Migration Initialization | `e43d68f` | Alembic async migrations initialized and linked to Base.metadata. |
 | **Task 1.5** | Pending | Structured Logging Configuration | *Pending* | |
 | **Task 1.6** | Pending | Health Check API Endpoint | *Pending* | |
 | **Task 2.1** | Pending | Define User and Auth DB Models | *Pending* | |
