@@ -20,7 +20,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Establish Async PostgreSQL SQLAlchemy Connection
 - [x] Initialize Alembic Migrations
 - [x] Configure Structured JSON Logging
-- [ ] Add Database Health Check Endpoint
+- [x] Add Database Health Check Endpoint
 - [ ] Implement Auth User & Profile Models
 - [ ] Implement JWT Registration, Login, and Authorization
 

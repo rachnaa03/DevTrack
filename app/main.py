@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
 
+from app.api.health import router as health_router
 from app.core.config import settings
 from app.core.logging import request_id_ctx, setup_logging
 
@@ -87,3 +88,7 @@ async def logging_middleware(request: Request, call_next) -> Response:
 @app.get("/")
 async def root() -> dict[str, str]:
     return {"message": "DevTrack API is running"}
+
+
+# 6. Registered API Routers
+app.include_router(health_router, prefix="/api/v1")

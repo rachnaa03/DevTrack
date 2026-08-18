@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Created `HealthResponse` Pydantic response schema in `app/schemas/health.py`.
+- Configured structured exception logging for database connectivity failures in the health router.
+- Added unit and integration test suite `tests/api/test_health.py` for mocking successful/unhealthy DB connection states.
+
 ## [0.1.0] - 2026-08-03
 
 ### Added
