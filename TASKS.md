@@ -15,7 +15,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 1.4** | Completed | Alembic Migration Initialization | `e43d68f` | Alembic async migrations initialized and linked to Base.metadata. |
 | **Task 1.5** | Completed | Structured Logging Configuration | `9c49c3f` | Structured JSON logging formatter, request ID middleware, and lifespan logging. |
 | **Task 1.6** | Completed | Health Check API Endpoint | `e4c58c9` | Exposes `/api/v1/health` verifying async database connectivity. |
-| **Task 2.1** | Pending | Define User and Auth DB Models | *Pending* | |
+| **Task 2.1** | Completed | Define User and Auth DB Models | `44db50c` | Defined SQLAlchemy 2.0 User model and generated Alembic migration script. |
 | **Task 2.2** | Pending | Implement Password Hashing Utility Functions | *Pending* | |
 | **Task 2.3** | Pending | Implement User Registration API | *Pending* | |
 | **Task 2.4** | Pending | Implement User Login API | *Pending* | |
