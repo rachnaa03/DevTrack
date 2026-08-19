@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Implemented secure password hashing and verification utilities (`hash_password`, `verify_password`) using native `bcrypt` in `app/core/security.py`.
+- Created automated unit tests in `tests/core/test_security.py` verifying hash salting, successful matches, and validation failures.
 - Defined SQLAlchemy 2.0 database model for the `User` entity (`users` table).
 - Implemented unique index constraint `idx_users_email` on the `email` column.
 - Created Alembic database schema migration script to provision the `users` table.
