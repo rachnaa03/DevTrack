@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Implemented user registration endpoint `POST /api/v1/auth/register` mapping request schemas, duplicate validations, and credentials storage.
+- Created database operations layer `UserRepository` in `app/repositories/user.py`.
+- Created authentication service layer `AuthService` in `app/services/auth.py`.
+- Defined application exceptions (`DevTrackException`, `EmailAlreadyExistsException`) in `app/utils/exceptions.py`.
+- Created API and service integration test suites `tests/api/test_auth.py` and `tests/services/test_auth_service.py`.
 - Implemented secure password hashing and verification utilities (`hash_password`, `verify_password`) using native `bcrypt` in `app/core/security.py`.
 - Created automated unit tests in `tests/core/test_security.py` verifying hash salting, successful matches, and validation failures.
 - Defined SQLAlchemy 2.0 database model for the `User` entity (`users` table).

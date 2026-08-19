@@ -20,7 +20,7 @@
 ## 2. Programming Language: Python 3.11+
 *   **Why it fits this project:**
     *   **Data Processing Capabilities:** Python is the industry standard for data manipulation, analytics, and string parsing. Writing analyzers (parsing JSON arrays of commits, scoring algorithms, and string insights) is highly expressive and clean in Python.
-    *   **Ecosystem:** Rich ecosystem of packages for HTTP connections (`httpx`, `requests`), scheduling (`apscheduler`), and cryptographic hashing (`passlib`, `bcrypt`).
+    *   **Ecosystem:** Rich ecosystem of packages for HTTP connections (`httpx`, `requests`), scheduling (`apscheduler`), and cryptographic hashing (`bcrypt`).
 
 ---
 
@@ -55,7 +55,7 @@
     *   Used for stateless, secure user sessions.
     *   Token payload contains the user ID, issue timestamp, and expiration time. Signed using `HS256` with a server-side secret key.
 *   **Password Hashing:**
-    *   Passwords will be hashed using `bcrypt` (via `passlib` or `cryptography`) before saving to PostgreSQL. Raw passwords are never stored.
+    *   Passwords will be hashed using native `bcrypt` before saving to PostgreSQL. Raw passwords are never stored.
 *   **Authentication Flow:**
     ```
     [Frontend]                        [FastAPI Backend]                [PostgreSQL]
