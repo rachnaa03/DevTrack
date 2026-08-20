@@ -14,3 +14,16 @@ class UserRegisterResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserLoginRequest(BaseModel):
+    """Pydantic model representing login request body."""
+    email: EmailStr = Field(..., description="User email address")
+    password: str = Field(..., description="User password")
+
+class TokenResponse(BaseModel):
+    """Pydantic model representing authentication tokens response."""
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+

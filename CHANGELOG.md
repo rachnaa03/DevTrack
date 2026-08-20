@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Implemented user login endpoint `POST /api/v1/auth/login` returning signed JWT access and refresh tokens.
+- Centralized JWT signing functions (`create_access_token`, `create_refresh_token`) inside `app/core/security.py` using HS256 algorithm and environment configuration.
+- Added custom exception `InvalidCredentialsException` in `app/utils/exceptions.py` mapping to generic HTTP 401 failures.
+- Added timing attack protection inside `AuthService.authenticate_user(...)` via dummy bcrypt hashing for non-existent emails.
+- Added unit and integration test suites in `tests/api/test_login.py` and `tests/services/test_auth_service.py`.
 - Implemented user registration endpoint `POST /api/v1/auth/register` mapping request schemas, duplicate validations, and credentials storage.
 - Created database operations layer `UserRepository` in `app/repositories/user.py`.
 - Created authentication service layer `AuthService` in `app/services/auth.py`.

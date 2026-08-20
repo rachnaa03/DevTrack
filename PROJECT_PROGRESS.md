@@ -23,6 +23,10 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Add Database Health Check Endpoint
 - [/] Implement Auth User & Profile Models
 - [/] Implement JWT Registration, Login, and Authorization
+  - [x] User Registration API (Task 2.3)
+  - [x] User Login API & JWT Generation (Task 2.4)
+  - [ ] JWT Dependency Injection (Task 2.5)
+  - [ ] Protected Routes Verification (Task 2.6)
 
 ### 3. Platform Integrations
 - [ ] Build Out Integration Framework & Clients Base Class

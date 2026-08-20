@@ -14,3 +14,13 @@ class EmailAlreadyExistsException(DevTrackException):
             message="User with this email is already registered.",
             status_code=400
         )
+
+class InvalidCredentialsException(DevTrackException):
+    """Raised when login authentication fails due to bad credentials."""
+    def __init__(self) -> None:
+        super().__init__(
+            code="AUTHENTICATION_FAILED",
+            message="Invalid email or password.",
+            status_code=401
+        )
+

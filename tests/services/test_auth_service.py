@@ -53,3 +53,66 @@ async def test_service_register_database_integrity_race() -> None:
 
     mock_repo.get_by_email.assert_called_once_with("race@example.com")
     mock_repo.create.assert_called_once()
+
+from app.core.security import hash_password
+from app.utils.exceptions import InvalidCredentialsException
+import uuid
+
+@pytest.mark.asyncio
+async def test_service_authenticate_success() -> None:
+    """Verify that AuthService authenticates a user successfully and returns tokens."""
+    mock_repo = MagicMock(spec=UserRepository)
+    
+    plain_password = "SecurePassword123!"
+    hashed_pw = hash_password(plain_password)
+    user_id = uuid.uuid4()
+    
+    existing_user = User(
+        id=user_id,
+        email="auth@example.com",
+        hashed_password=hashed_pw
+    )
+    mock_repo.get_by_email = AsyncMock(return_value=existing_user)
+
+    service = AuthService(mock_repo)
+    result = await service.authenticate_user(email="auth@example.com", password=plain_password)
+
+    assert "access_token" in result
+    assert "refresh_token" in result
+    assert result["token_type"] == "bearer"
+    assert result["expires_in"] > 0
+    mock_repo.get_by_email.assert_called_once_with("auth@example.com")
+
+@pytest.mark.asyncio
+async def test_service_authenticate_incorrect_password() -> None:
+    """Verify that AuthService raises InvalidCredentialsException on bad password."""
+    mock_repo = MagicMock(spec=UserRepository)
+    
+    plain_password = "SecurePassword123!"
+    hashed_pw = hash_password(plain_password)
+    
+    existing_user = User(
+        id=uuid.uuid4(),
+        email="auth@example.com",
+        hashed_password=hashed_pw
+    )
+    mock_repo.get_by_email = AsyncMock(return_value=existing_user)
+
+    service = AuthService(mock_repo)
+    with pytest.raises(InvalidCredentialsException):
+        await service.authenticate_user(email="auth@example.com", password="WrongPassword123!")
+
+    mock_repo.get_by_email.assert_called_once_with("auth@example.com")
+
+@pytest.mark.asyncio
+async def test_service_authenticate_nonexistent_user() -> None:
+    """Verify that AuthService raises InvalidCredentialsException on nonexistent email."""
+    mock_repo = MagicMock(spec=UserRepository)
+    mock_repo.get_by_email = AsyncMock(return_value=None)
+
+    service = AuthService(mock_repo)
+    with pytest.raises(InvalidCredentialsException):
+        await service.authenticate_user(email="notfound@example.com", password="AnyPassword123!")
+
+    mock_repo.get_by_email.assert_called_once_with("notfound@example.com")
+
