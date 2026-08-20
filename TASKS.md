@@ -19,7 +19,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 2.2** | Completed | Implement Password Hashing Utility Functions | `53a175d` | Implemented password hash generation and verification using native bcrypt. |
 | **Task 2.3** | Completed | Implement User Registration API | `975f0e5` | Implemented POST /api/v1/auth/register endpoint with validation and duplicate checking. |
 | **Task 2.4** | Completed | Implement User Login API | `535a596` | Implemented POST /api/v1/auth/login endpoint returning access and refresh tokens. |
-| **Task 2.5** | Pending | Implement JWT Dependency Injection | *Pending* | |
+| **Task 2.5** | Completed | Implement JWT Dependency Injection | `866362a` | Implemented JWT decoding and get_current_user dependency injection. |
 | **Task 2.6** | Pending | Create Protected Routes Verification | *Pending* | |
 | **Task 3.1** | Pending | Design Profile Database Model | *Pending* | |
 | **Task 3.2** | Pending | Implement Profile Retrieval & Update API | *Pending* | |

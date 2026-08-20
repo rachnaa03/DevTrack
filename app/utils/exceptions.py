@@ -24,3 +24,13 @@ class InvalidCredentialsException(DevTrackException):
             status_code=401
         )
 
+class AuthenticationException(DevTrackException):
+    """Raised when JWT validation or extraction fails."""
+    def __init__(self) -> None:
+        super().__init__(
+            code="AUTHENTICATION_FAILED",
+            message="Could not validate credentials.",
+            status_code=401
+        )
+
+
