@@ -156,16 +156,20 @@ All API exceptions return the following standard JSON shape (as specified in [ER
 *   **URL**: `/api/v1/profile`
 *   **Purpose**: Retrieve profile bio, avatar link, and connected platform handles.
 *   **Authentication**: Required (JWT Bearer)
+*   **Behavior**: If the authenticated user does not have a Profile record in the database, an empty Profile is lazily created and persisted before being returned.
 *   **Status Codes**:
     *   `200 OK`: Success.
-    *   `404 Not Found`: Profile records missing.
+    *   `401 Unauthorized`: Missing or invalid Bearer token.
 *   **Example Response (`200 OK`)**:
     ```json
     {
+      "id": "e939a897-f0b4-4f81-9b1f-7bb66487fb01",
+      "user_id": "c3dc45a8-a58c-4f81-9b1f-7bb66487fb02",
       "bio": "Senior Python Developer | Open Source Enthusiast",
       "avatar_url": "https://avatars.example.com/dev.jpg",
       "github_username": "octocat",
       "leetcode_username": "lc_master",
+      "created_at": "2026-08-03T22:00:00Z",
       "updated_at": "2026-08-03T22:10:00Z"
     }
     ```
@@ -175,14 +179,16 @@ All API exceptions return the following standard JSON shape (as specified in [ER
 ### 3.2 Update Profile Metadata
 *   **Method**: `PUT`
 *   **URL**: `/api/v1/profile`
-*   **Purpose**: Update editable bio fields.
+*   **Purpose**: Update profile biography and avatar URL.
 *   **Authentication**: Required (JWT Bearer)
+*   **Behavior**: Supports partial updates (omitted parameters remain unchanged in the DB, while explicitly provided fields are updated). Rejects any unknown or forbidden fields.
 *   **Request Body**:
-    *   `bio` (String, nullable): Text profile description, max 1000 chars.
-    *   `avatar_url` (String, nullable): Fully qualified HTTP/HTTPS image URL.
+    *   `bio` (String, nullable, optional): Text profile description, max 1000 chars.
+    *   `avatar_url` (String, nullable, optional): Fully qualified HTTP/HTTPS image URL (max 1024 chars).
 *   **Status Codes**:
     *   `200 OK`: Update successful.
-    *   `400 Bad Request`: Input validation failed.
+    *   `401 Unauthorized`: Missing or invalid Bearer token.
+    *   `422 Unprocessable Content`: Input validation failed, URL protocol check failed, or forbidden fields (e.g. `github_username`, `user_id`) were submitted.
 *   **Example Request**:
     ```json
     {
@@ -193,10 +199,13 @@ All API exceptions return the following standard JSON shape (as specified in [ER
 *   **Example Response (`200 OK`)**:
     ```json
     {
+      "id": "e939a897-f0b4-4f81-9b1f-7bb66487fb01",
+      "user_id": "c3dc45a8-a58c-4f81-9b1f-7bb66487fb02",
       "bio": "Principal Engineer at TechCorp",
       "avatar_url": "https://avatars.example.com/new_dev.jpg",
       "github_username": "octocat",
       "leetcode_username": "lc_master",
+      "created_at": "2026-08-03T22:00:00Z",
       "updated_at": "2026-08-03T22:15:00Z"
     }
     ```

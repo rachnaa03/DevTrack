@@ -28,20 +28,26 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] JWT Dependency Injection (Task 2.5)
   - [x] Protected Routes Verification (Task 2.6)
 
-### 3. Platform Integrations
+### 3. User Profile Management (MVP)
+- [/] User Profile APIs & Platform Connection
+  - [x] Design Profile Database Model (Task 3.1)
+  - [x] Implement Profile Retrieval & Update API (Task 3.2)
+  - [ ] Implement Platform Username Connection API (Task 3.3)
+
+### 4. Platform Integrations
 - [ ] Build Out Integration Framework & Clients Base Class
 - [ ] Implement GitHub HTTP Client Adapter and Ingestion Services
 - [ ] Implement LeetCode GraphQL Client Adapter and Ingestion Services
 - [ ] Setup Daily Platform History Tables
 - [ ] Implement Delta Trend Queries
 
-### 4. Analytics & Engines
+### 5. Analytics & Engines
 - [ ] Build Developer Analytics Engine (GitHub/LeetCode Analyzers)
 - [ ] Implement Weighted Scoring Algorithm (Consistency, Depth, Impact)
 - [ ] Build Rule-Based Insights Engine (Delta Snapshots comparison)
 - [ ] Build Rule-Based Recommendations Engine
 
-### 5. Dashboard & Scheduler
+### 6. Dashboard & Scheduler
 - [ ] Implement Dashboard Summary API Endpoint
 - [ ] Implement Chart Data Feeds
 - [ ] Implement Milestone Badges and Timeline Events
@@ -49,7 +55,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [ ] Implement Synchronization Job Orchestrator
 - [ ] Implement Weekly Retrospective Reports
 
-### 6. Frontend Dashboard
+### 7. Frontend Dashboard
 - [ ] Initialize React App using Vite
 - [ ] Build Registration & Login Screens
 - [ ] Build Main Layout & Sidebar Navigation
@@ -57,13 +63,13 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [ ] Implement Recharts Analytical Visualizations
 - [ ] Build User Profile Connection Interface
 
-### 7. Testing & Quality Assurance
+### 8. Testing & Quality Assurance
 - [ ] Set up Pytest Suite & Database Fixtures
 - [ ] Implement Core Business Logic Unit Tests
 - [ ] Implement Endpoint Integration Tests
 - [ ] Mock External API Integrations (GitHub & LeetCode)
 
-### 8. Production Deployment
+### 9. Production Deployment
 - [ ] Define VPS hosting environment settings
 - [ ] Configure Reverse Proxy (Nginx) & Uvicorn Systemd Services
 - [ ] Verify Production Deployment Checklists
