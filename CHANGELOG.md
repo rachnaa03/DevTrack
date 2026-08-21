@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Designed and implemented `AsyncRateLimiter` (sliding-window async limiter) and `async_retry` (exponential backoff retry decorator) inside `app/services/integrations/helpers.py`.
+- Created comprehensive helper tests in `tests/services/integrations/test_helpers.py` checking validation, concurrency limits, and retry semantics.
 - Created generic synchronization validation helper `validate_platform_data` and custom exception `PlatformValidationException` to format and check external APIs structurally.
 - Designed foundational Pydantic v2 schemas `GitHubProfileSyncSchema` and `GitHubRepoSyncSchema` to validate GitHub profiles and repositories with strict field checks.
 - Implemented sync validation test cases in `tests/services/integrations/test_sync_validation.py`.
