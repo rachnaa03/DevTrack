@@ -29,10 +29,10 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Protected Routes Verification (Task 2.6)
 
 ### 3. User Profile Management (MVP)
-- [/] User Profile APIs & Platform Connection
+- [x] User Profile APIs & Platform Connection
   - [x] Design Profile Database Model (Task 3.1)
   - [x] Implement Profile Retrieval & Update API (Task 3.2)
-  - [ ] Implement Platform Username Connection API (Task 3.3)
+  - [x] Implement Platform Username Connection API (Task 3.3)
 
 ### 4. Platform Integrations
 - [ ] Build Out Integration Framework & Clients Base Class

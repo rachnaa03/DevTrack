@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Implemented authenticated platform username connection endpoint `PUT /api/v1/profile/connect` allowing users to bind GitHub/LeetCode handles with strict regex formats and validation checks.
 - Implemented authenticated user profile metadata fetch (`GET /api/v1/profile`) and update (`PUT /api/v1/profile`) endpoints with strict extra parameter rejection.
 - Configured lazy database profile provisioning (Option B) and partial field update validation handlers.
 - Created endpoint integration tests in `tests/api/test_profile_api.py`.

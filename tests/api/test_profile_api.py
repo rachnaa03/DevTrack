@@ -224,3 +224,212 @@ def test_put_profile_unauthenticated() -> None:
         json={"bio": "Unauth update"}
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+def test_connect_platforms_github_only(mock_user: User, mock_db: AsyncMock) -> None:
+    """Verify successfully connecting only GitHub username."""
+    profile_id = uuid.uuid4()
+    mock_profile = Profile(
+        id=profile_id,
+        user_id=mock_user.id,
+        github_username=None,
+        leetcode_username="old_lc",
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
+    )
+
+    mock_execute_result = MagicMock()
+    mock_execute_result.scalars().first.return_value = mock_profile
+    mock_db.execute.return_value = mock_execute_result
+    mock_db.commit = AsyncMock()
+    mock_db.refresh = AsyncMock()
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_db] = lambda: mock_db
+    try:
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "valid-username-123"}
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["github_username"] == "valid-username-123"
+        assert data["leetcode_username"] == "old_lc"
+        assert mock_profile.github_username == "valid-username-123"
+        assert mock_profile.leetcode_username == "old_lc"
+    finally:
+        app.dependency_overrides.clear()
+
+def test_connect_platforms_leetcode_only(mock_user: User, mock_db: AsyncMock) -> None:
+    """Verify successfully connecting only LeetCode username."""
+    profile_id = uuid.uuid4()
+    mock_profile = Profile(
+        id=profile_id,
+        user_id=mock_user.id,
+        github_username="old_git",
+        leetcode_username=None,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
+    )
+
+    mock_execute_result = MagicMock()
+    mock_execute_result.scalars().first.return_value = mock_profile
+    mock_db.execute.return_value = mock_execute_result
+    mock_db.commit = AsyncMock()
+    mock_db.refresh = AsyncMock()
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_db] = lambda: mock_db
+    try:
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"leetcode_username": "valid_lc-name"}
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["github_username"] == "old_git"
+        assert data["leetcode_username"] == "valid_lc-name"
+    finally:
+        app.dependency_overrides.clear()
+
+def test_connect_platforms_both(mock_user: User, mock_db: AsyncMock) -> None:
+    """Verify successfully connecting both usernames."""
+    profile_id = uuid.uuid4()
+    mock_profile = Profile(
+        id=profile_id,
+        user_id=mock_user.id,
+        github_username=None,
+        leetcode_username=None,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
+    )
+
+    mock_execute_result = MagicMock()
+    mock_execute_result.scalars().first.return_value = mock_profile
+    mock_db.execute.return_value = mock_execute_result
+    mock_db.commit = AsyncMock()
+    mock_db.refresh = AsyncMock()
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_db] = lambda: mock_db
+    try:
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "valid-git", "leetcode_username": "valid-lc"}
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["github_username"] == "valid-git"
+        assert data["leetcode_username"] == "valid-lc"
+    finally:
+        app.dependency_overrides.clear()
+
+def test_connect_platforms_lazy_creation(mock_user: User, mock_db: AsyncMock) -> None:
+    """Verify lazy profile creation works when connecting platforms for a user without a profile."""
+    mock_execute_result = MagicMock()
+    mock_execute_result.scalars().first.return_value = None
+    mock_db.execute.return_value = mock_execute_result
+    mock_db.add = MagicMock()
+    mock_db.commit = AsyncMock()
+    
+    profile_id = uuid.uuid4()
+    async def mock_refresh(profile):
+        profile.id = profile_id
+        profile.created_at = datetime.now(timezone.utc)
+        profile.updated_at = datetime.now(timezone.utc)
+    mock_db.refresh = mock_refresh
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_db] = lambda: mock_db
+    try:
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "valid-git"}
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["github_username"] == "valid-git"
+        assert data["user_id"] == str(mock_user.id)
+    finally:
+        app.dependency_overrides.clear()
+
+def test_connect_platforms_validation_failures(mock_user: User) -> None:
+    """Verify validation constraints reject invalid payloads with HTTP 422."""
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    try:
+        # 1. Both fields omitted
+        response = client.put("/api/v1/profile/connect", json={})
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 2. Both fields null
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": None, "leetcode_username": None}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 3. Empty string
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": ""}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 4. Whitespace-containing
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "git name"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 5. Invalid GitHub username (starts with hyphen)
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "-invalid"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 6. Invalid GitHub username (ends with hyphen)
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "invalid-"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 7. Invalid GitHub username (consecutive hyphens)
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "inv--alid"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 8. Invalid GitHub username (too long)
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "a" * 40}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 9. Invalid LeetCode username (contains special character)
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"leetcode_username": "lc@name"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+        # 10. Forbidden extra fields
+        response = client.put(
+            "/api/v1/profile/connect",
+            json={"github_username": "valid-git", "bio": "forbidden bio update"}
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    finally:
+        app.dependency_overrides.clear()
+
+def test_connect_platforms_unauthenticated() -> None:
+    """Verify PUT /profile/connect is rejected with HTTP 401 when unauthenticated."""
+    response = client.put(
+        "/api/v1/profile/connect",
+        json={"github_username": "valid-git"}
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+

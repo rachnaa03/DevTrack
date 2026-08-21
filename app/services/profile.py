@@ -24,3 +24,13 @@ class ProfileService:
             setattr(profile, key, value)
             
         return await self.profile_repo.update(profile)
+
+    async def connect_platforms(self, user_id: UUID, update_data: dict) -> Profile:
+        """Connect or update platform usernames partially, preserving existing values for omitted fields."""
+        profile = await self.get_or_create_profile(user_id)
+        
+        for key, value in update_data.items():
+            setattr(profile, key, value)
+            
+        return await self.profile_repo.update(profile)
+

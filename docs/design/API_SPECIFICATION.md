@@ -213,32 +213,39 @@ All API exceptions return the following standard JSON shape (as specified in [ER
 ---
 
 ### 3.3 Link Platform Account
-*   **Method**: `POST`
+*   **Method**: `PUT`
 *   **URL**: `/api/v1/profile/connect`
-*   **Purpose**: Securely bind or update platform usernames.
+*   **Purpose**: Securely connect or update platform usernames.
 *   **Authentication**: Required (JWT Bearer)
+*   **Behavior**: If the authenticated user does not have a Profile record in the database, an empty Profile is lazily created first. Updates are applied to the supplied username fields, while omitted fields remain unchanged.
 *   **Request Body**:
-    *   `github_username` (String, nullable): GitHub handle.
-    *   `leetcode_username` (String, nullable): LeetCode handle.
+    *   `github_username` (String, optional): Valid GitHub username syntax (1-39 chars, alphanumeric/single hyphen, cannot start or end with a hyphen, no consecutive hyphens).
+    *   `leetcode_username` (String, optional): Valid LeetCode username syntax (alphanumeric, underscores, hyphens).
 *   **Validation Rules**:
-    *   Enforces alphanumeric constraints on username shapes.
-    *   Accepts empty string/null to unlink.
+    *   At least one platform username must be provided. If both are omitted or explicitly null, returns `422`.
+    *   Whitespace-only, empty strings, or usernames containing spaces are rejected with `422`.
+    *   Submitting forbidden extra fields is rejected with `422`.
 *   **Status Codes**:
-    *   `200 OK`: Handles successfully updated in the DB.
-    *   `400 Bad Request`: Username format validation failed.
+    *   `200 OK`: Platform accounts connected successfully. Returns updated ProfileResponse.
+    *   `401 Unauthorized`: Missing or invalid Bearer token.
+    *   `422 Unprocessable Content`: Syntax check, empty string check, or forbidden field validation failed.
 *   **Example Request**:
     ```json
     {
-      "github_username": "octocat",
-      "leetcode_username": "lc_master"
+      "github_username": "octocat"
     }
     ```
 *   **Example Response (`200 OK`)**:
     ```json
     {
+      "id": "e939a897-f0b4-4f81-9b1f-7bb66487fb01",
+      "user_id": "c3dc45a8-a58c-4f81-9b1f-7bb66487fb02",
+      "bio": "Principal Engineer at TechCorp",
+      "avatar_url": "https://avatars.example.com/new_dev.jpg",
       "github_username": "octocat",
       "leetcode_username": "lc_master",
-      "message": "Platform accounts connected successfully. Initial synchronization scheduled."
+      "created_at": "2026-08-03T22:00:00Z",
+      "updated_at": "2026-08-03T22:20:00Z"
     }
     ```
 
