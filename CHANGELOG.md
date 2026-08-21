@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Verified security controls for the protected user route `GET /api/v1/auth/me` to prevent unauthorized resource leakage.
 - Implemented JWT token validation and reusable dependency `get_current_user` inside `app/api/dependencies/auth.py`.
 - Added protected endpoint `GET /api/v1/auth/me` returning safe details of the authenticated developer.
 - Added database lookup method `get_by_id` inside `UserRepository` in `app/repositories/user.py`.
