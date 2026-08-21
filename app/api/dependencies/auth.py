@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,18 +10,18 @@ from app.models.user import User
 from app.repositories.user import UserRepository
 from app.utils.exceptions import AuthenticationException
 
-# Define OAuth2 scheme with the tokenUrl configuration
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
+# Define HTTPBearer scheme and disable automatic error raising
+security_scheme = HTTPBearer(auto_error=False)
 
 async def get_current_user(
-    token: str | None = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
     db: AsyncSession = Depends(get_db)
 ) -> User:
     """
-    Extract JWT token, decode/validate it, and return the currently authenticated User.
+    Extract JWT token from Bearer authorization, validate it, and return the currently authenticated User.
     
     Args:
-        token: The extracted Bearer token from the request (if present).
+        credentials: The parsed HTTP Authorization credentials.
         db: Database session.
         
     Returns:
@@ -29,9 +29,16 @@ async def get_current_user(
         
     Raises:
         AuthenticationException: For any validation, signature, expiration, claim,
-                                 or user retrieval failure.
+                                 unsupported scheme, or user retrieval failure.
     """
-    if token is None:
+    if credentials is None:
+        raise AuthenticationException()
+        
+    if credentials.scheme.lower() != "bearer":
+        raise AuthenticationException()
+        
+    token = credentials.credentials
+    if not token:
         raise AuthenticationException()
         
     try:

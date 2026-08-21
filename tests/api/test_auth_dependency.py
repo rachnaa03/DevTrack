@@ -155,3 +155,28 @@ def test_get_me_nonexistent_user() -> None:
         assert data["error"]["code"] == "AUTHENTICATION_FAILED"
     finally:
         app.dependency_overrides.clear()
+
+def test_get_me_unsupported_scheme() -> None:
+    """Verify that an unsupported authentication scheme (like Basic or generic token) is rejected with HTTP 401."""
+    user_id = uuid.uuid4()
+    access_token = create_access_token({"sub": str(user_id)})
+    
+    # Try with Basic auth
+    response = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Basic {access_token}"}
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    data = response.json()
+    assert data["error"]["code"] == "AUTHENTICATION_FAILED"
+    assert data["error"]["message"] == "Could not validate credentials."
+
+    # Try with raw token (no scheme prefix)
+    response = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": access_token}
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    data = response.json()
+    assert data["error"]["code"] == "AUTHENTICATION_FAILED"
+

@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Defined SQLAlchemy 2.0 database model for the `User` entity (`users` table).
 - Implemented unique index constraint `idx_users_email` on the `email` column.
 - Created Alembic database schema migration script to provision the `users` table.
+
+### Fixed
+- Replaced `OAuth2PasswordBearer` with `HTTPBearer` to resolve Swagger UI authorization prompt mismatches, allowing token authorization without requesting username/password forms.
+- Explicitly check and validate token scheme prefixes to prevent accepting unsupported authentication headers.
 - Created model unit tests in `tests/models/test_user.py` to verify attributes, columns, and index constraints.
 - Created `HealthResponse` Pydantic response schema in `app/schemas/health.py`.
 - Configured structured exception logging for database connectivity failures in the health router.
