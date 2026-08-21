@@ -32,5 +32,11 @@ class AuthenticationException(DevTrackException):
             message="Could not validate credentials.",
             status_code=401
         )
-
-
+class PlatformValidationException(DevTrackException):
+    """Raised when third-party platform data fails schema validation."""
+    def __init__(self, platform: str, details: str) -> None:
+        super().__init__(
+            code="PLATFORM_VALIDATION_FAILED",
+            message=f"Validation failed for {platform} data: {details}",
+            status_code=502
+        )
