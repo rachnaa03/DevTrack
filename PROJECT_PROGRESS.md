@@ -21,7 +21,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Initialize Alembic Migrations
 - [x] Configure Structured JSON Logging
 - [x] Add Database Health Check Endpoint
-- [/] Implement Auth User & Profile Models
+- [x] Implement Auth User & Profile Models
 - [x] Implement JWT Registration, Login, and Authorization
   - [x] User Registration API (Task 2.3)
   - [x] User Login API & JWT Generation (Task 2.4)

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Designed `Profile` database model in `app/models/profile.py` with bio, avatar, and integration handles.
+- Generated Alembic database schema migration to provision the `profiles` table and `idx_profiles_user_id` unique index.
+- Configured 1:1 bidirectional mapping between `User` and `Profile` models in SQLAlchemy.
+- Created model mapping unit tests in `tests/models/test_profile.py`.
 - Verified security controls for the protected user route `GET /api/v1/auth/me` to prevent unauthorized resource leakage.
 - Implemented JWT token validation and reusable dependency `get_current_user` inside `app/api/dependencies/auth.py`.
 - Added protected endpoint `GET /api/v1/auth/me` returning safe details of the authenticated developer.

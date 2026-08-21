@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import String, DateTime, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
@@ -36,6 +37,14 @@ class User(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now()
+    )
+
+    # 1:1 bidirectional relationship mapping pointing to Profile
+    profile: Mapped[Optional["Profile"]] = relationship(
+        "Profile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = (
