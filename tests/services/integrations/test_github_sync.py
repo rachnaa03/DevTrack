@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from app.models.profile import Profile
+from app.models.github_snapshot import GitHubSnapshot
 from app.repositories.profile import ProfileRepository
+from app.repositories.github_snapshot import GitHubSnapshotRepository
 from app.services.integrations.github import GitHubClient
 from app.services.integrations.github_parser import GitHubDataParser
 from app.services.integrations.github_sync import GitHubSyncService
@@ -14,6 +16,15 @@ from app.utils.exceptions import (
     PlatformValidationException,
     PlatformRateLimitException,
 )
+
+# --- Pytest Fixtures ---
+
+@pytest.fixture
+def mock_snapshot_repo() -> MagicMock:
+    """Fixture returning a mocked GitHubSnapshotRepository."""
+    repo = MagicMock(spec=GitHubSnapshotRepository)
+    repo.create = AsyncMock(side_effect=lambda x: x)
+    return repo
 
 # --- GitHubDataParser Tests ---
 
@@ -104,14 +115,12 @@ def test_parser_missing_optional_fields() -> None:
         "profile": {
             "id": 12345,
             "login": "testuser",
-            # Omit bio & avatar_url
         },
         "repositories": [
             {
                 "id": 9991,
                 "name": "repo1",
                 "full_name": "testuser/repo1",
-                # Omit description & language
                 "html_url": "https://github.com/testuser/repo1",
                 "stargazers_count": 0,
                 "forks_count": 0,
@@ -179,32 +188,32 @@ def test_parser_malformed_type_raises_exception() -> None:
 # --- GitHubSyncService Tests ---
 
 @pytest.mark.asyncio
-async def test_sync_missing_profile_raises_not_connected() -> None:
+async def test_sync_missing_profile_raises_not_connected(mock_snapshot_repo: MagicMock) -> None:
     """Verify that a user without a profile raises PlatformNotConnectedException."""
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=None)
     github_client = MagicMock(spec=GitHubClient)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     
     with pytest.raises(PlatformNotConnectedException):
         await service.sync_github_data(uuid.uuid4())
 
 @pytest.mark.asyncio
-async def test_sync_missing_github_username_raises_not_connected() -> None:
+async def test_sync_missing_github_username_raises_not_connected(mock_snapshot_repo: MagicMock) -> None:
     """Verify that a profile without a connected github_username raises PlatformNotConnectedException."""
     profile = Profile(user_id=uuid.uuid4(), github_username=None)
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=profile)
     github_client = MagicMock(spec=GitHubClient)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     
     with pytest.raises(PlatformNotConnectedException):
         await service.sync_github_data(profile.user_id)
 
 @pytest.mark.asyncio
-async def test_sync_success_profile_updated() -> None:
+async def test_sync_success_profile_updated(mock_snapshot_repo: MagicMock) -> None:
     """Verify that new non-null GitHub bio/avatar values update the database Profile."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -228,7 +237,7 @@ async def test_sync_success_profile_updated() -> None:
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     result = await service.sync_github_data(profile.user_id)
     
     assert result.success is True
@@ -237,9 +246,10 @@ async def test_sync_success_profile_updated() -> None:
     assert profile.bio == "New Bio from GitHub"
     assert profile.avatar_url == "https://new.com/avatar.png"
     profile_repo.update.assert_called_once_with(profile)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_only_bio_changes() -> None:
+async def test_sync_only_bio_changes(mock_snapshot_repo: MagicMock) -> None:
     """Verify update is triggered when only the bio field changes."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -263,15 +273,16 @@ async def test_sync_only_bio_changes() -> None:
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     result = await service.sync_github_data(profile.user_id)
     
     assert result.profile_updated is True
     assert profile.bio == "New Bio"
     profile_repo.update.assert_called_once_with(profile)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_only_avatar_changes() -> None:
+async def test_sync_only_avatar_changes(mock_snapshot_repo: MagicMock) -> None:
     """Verify update is triggered when only the avatar field changes."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -295,15 +306,16 @@ async def test_sync_only_avatar_changes() -> None:
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     result = await service.sync_github_data(profile.user_id)
     
     assert result.profile_updated is True
     assert profile.avatar_url == "https://new.com/avatar.png"
     profile_repo.update.assert_called_once_with(profile)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_idempotency_fields_unchanged() -> None:
+async def test_sync_idempotency_fields_unchanged(mock_snapshot_repo: MagicMock) -> None:
     """Verify that identical data triggers no database write."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -327,14 +339,15 @@ async def test_sync_idempotency_fields_unchanged() -> None:
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     result = await service.sync_github_data(profile.user_id)
     
     assert result.profile_updated is False
     profile_repo.update.assert_not_called()
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_null_value_preserves_local_data() -> None:
+async def test_sync_null_value_preserves_local_data(mock_snapshot_repo: MagicMock) -> None:
     """Verify that incoming null values from GitHub do not erase existing local profile values."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -351,24 +364,24 @@ async def test_sync_null_value_preserves_local_data() -> None:
         "profile": {
             "id": 123,
             "login": "testuser",
-            "bio": None,       # Null bio
-            "avatar_url": None # Null avatar
+            "bio": None,
+            "avatar_url": None
         },
         "repositories": []
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     result = await service.sync_github_data(profile.user_id)
     
-    # Assert that no database write is triggered and fields remain intact
     assert result.profile_updated is False
     assert profile.bio == "Valuable Bio"
     assert profile.avatar_url == "https://valuable.com/avatar.png"
     profile_repo.update.assert_not_called()
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_client_failures_propagate_without_db_updates() -> None:
+async def test_sync_client_failures_propagate_without_db_updates(mock_snapshot_repo: MagicMock) -> None:
     """Verify that downstream client errors propagate directly and do not run database updates."""
     profile = Profile(user_id=uuid.uuid4(), github_username="testuser")
     profile_repo = MagicMock(spec=ProfileRepository)
@@ -376,18 +389,18 @@ async def test_sync_client_failures_propagate_without_db_updates() -> None:
     profile_repo.update = AsyncMock()
     
     github_client = MagicMock(spec=GitHubClient)
-    # Simulate a rate limit hit
     github_client.fetch_raw_data = AsyncMock(side_effect=PlatformRateLimitException(platform="GitHub"))
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     
     with pytest.raises(PlatformRateLimitException):
         await service.sync_github_data(profile.user_id)
         
     profile_repo.update.assert_not_called()
+    mock_snapshot_repo.create.assert_not_called()
 
 @pytest.mark.asyncio
-async def test_sync_parser_failures_result_in_no_db_updates() -> None:
+async def test_sync_parser_failures_result_in_no_db_updates(mock_snapshot_repo: MagicMock) -> None:
     """Verify that payload parsing validation failures result in no database updates."""
     profile = Profile(user_id=uuid.uuid4(), github_username="testuser")
     profile_repo = MagicMock(spec=ProfileRepository)
@@ -395,19 +408,20 @@ async def test_sync_parser_failures_result_in_no_db_updates() -> None:
     profile_repo.update = AsyncMock()
     
     github_client = MagicMock(spec=GitHubClient)
-    # Malformed payload structure
     raw_payload = {"profile": {}, "repositories": "invalid-repos-format"}
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     
     with pytest.raises(PlatformValidationException):
         await service.sync_github_data(profile.user_id)
         
     profile_repo.update.assert_not_called()
+    # Snapshot must still be committed under separate stage transaction flow (Option A)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_persistence_failure_propagates() -> None:
+async def test_sync_persistence_failure_propagates(mock_snapshot_repo: MagicMock) -> None:
     """Verify that database transaction/commit failure propagates directly to the caller."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -417,7 +431,6 @@ async def test_sync_persistence_failure_propagates() -> None:
     )
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=profile)
-    # Simulate DB error during commit
     profile_repo.update = AsyncMock(side_effect=RuntimeError("Database Connection Lost"))
     
     github_client = MagicMock(spec=GitHubClient)
@@ -432,7 +445,7 @@ async def test_sync_persistence_failure_propagates() -> None:
     }
     github_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = GitHubSyncService(profile_repo, github_client)
+    service = GitHubSyncService(profile_repo, github_client, mock_snapshot_repo)
     
     with pytest.raises(RuntimeError, match="Database Connection Lost"):
         await service.sync_github_data(profile.user_id)

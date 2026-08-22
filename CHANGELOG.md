@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Designed `GitHubSnapshot` SQLAlchemy model in `app/models/github_snapshot.py` and `GitHubSnapshotRepository` in `app/repositories/github_snapshot.py` supporting postgres `JSONB` daily raw API backups.
+- Configured a database migration script `914773fe5de6_create_github_snapshots_table.py` using Alembic and registered relationships on the `User` model.
+- Integrated Option A stage-wise transaction flow into `GitHubSyncService` to commit raw payloads prior to parsing.
+- Created repository/model unit tests in `tests/services/integrations/test_github_snapshot.py` and extended existing integration tests in `tests/services/integrations/test_github_sync.py` to check snapshot limits, cascades, and transaction boundaries.
 - Implemented `GitHubDataParser` in `app/services/integrations/github_parser.py` validating and converting raw API payloads into strongly-typed models with accumulated metric aggregation.
 - Implemented `GitHubSyncService` in `app/services/integrations/github_sync.py` executing the profile synchronization pipeline with strict null-checking updates and local state constraints.
 - Added custom local business logic exception `PlatformNotConnectedException` for missing platform credentials.

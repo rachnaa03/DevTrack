@@ -2,7 +2,9 @@ from datetime import datetime, timezone
 from uuid import UUID
 import logging
 
+from app.models.github_snapshot import GitHubSnapshot
 from app.repositories.profile import ProfileRepository
+from app.repositories.github_snapshot import GitHubSnapshotRepository
 from app.services.integrations.github import GitHubClient
 from app.services.integrations.github_parser import GitHubDataParser
 from app.schemas.sync import GitHubSyncResult
@@ -13,14 +15,20 @@ logger = logging.getLogger(__name__)
 class GitHubSyncService:
     """Service responsible for orchestrating GitHub synchronization pipeline."""
     
-    def __init__(self, profile_repo: ProfileRepository, github_client: GitHubClient):
+    def __init__(
+        self,
+        profile_repo: ProfileRepository,
+        github_client: GitHubClient,
+        snapshot_repo: GitHubSnapshotRepository
+    ):
         self.profile_repo = profile_repo
         self.github_client = github_client
+        self.snapshot_repo = snapshot_repo
 
     async def sync_github_data(self, user_id: UUID) -> GitHubSyncResult:
         """
-        Orchestrates loading user profile, fetching external payload, parsing metrics,
-        and updating the internal database profile conditionally (non-destructively).
+        Orchestrates loading user profile, fetching external payload, persisting the raw
+        snapshot, parsing metrics, and updating the internal profile conditionally.
         """
         # 1. Retrieve the profile from database
         profile = await self.profile_repo.get_by_user_id(user_id)
@@ -33,7 +41,11 @@ class GitHubSyncService:
         # 2. Fetch raw payload from client (errors propagate)
         raw_payload = await self.github_client.fetch_raw_data(username)
         
-        # 3. Parse and validate the raw payload (validation errors raise PlatformValidationException)
+        # 3. Create and Commit raw snapshot (Option A - committed first)
+        snapshot = GitHubSnapshot(user_id=user_id, raw_data=raw_payload)
+        await self.snapshot_repo.create(snapshot)
+        
+        # 4. Parse and validate the raw payload (validation errors raise PlatformValidationException)
         parsed_data = GitHubDataParser.parse(raw_payload)
         
         # 4. Compare and update profile fields non-destructively

@@ -47,6 +47,13 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # 1:N relationship mapping pointing to GitHub snapshots
+    github_snapshots: Mapped[list["GitHubSnapshot"]] = relationship(
+        "GitHubSnapshot",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_users_email", "email", unique=True),
     )
