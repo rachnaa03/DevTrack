@@ -2,7 +2,9 @@ from datetime import datetime, timezone
 from uuid import UUID
 import logging
 
+from app.models.leetcode_snapshot import LeetCodeSnapshot
 from app.repositories.profile import ProfileRepository
+from app.repositories.leetcode_snapshot import LeetCodeSnapshotRepository
 from app.services.integrations.leetcode import LeetCodeClient
 from app.services.integrations.leetcode_parser import LeetCodeDataParser
 from app.schemas.sync import LeetCodeSyncResult
@@ -13,14 +15,20 @@ logger = logging.getLogger(__name__)
 class LeetCodeSyncService:
     """Service responsible for orchestrating LeetCode synchronization pipeline."""
     
-    def __init__(self, profile_repo: ProfileRepository, leetcode_client: LeetCodeClient):
+    def __init__(
+        self,
+        profile_repo: ProfileRepository,
+        leetcode_client: LeetCodeClient,
+        snapshot_repo: LeetCodeSnapshotRepository
+    ):
         self.profile_repo = profile_repo
         self.leetcode_client = leetcode_client
+        self.snapshot_repo = snapshot_repo
 
     async def sync_leetcode_data(self, user_id: UUID) -> LeetCodeSyncResult:
         """
-        Orchestrates loading user profile, fetching external payload, parsing metrics,
-        and updating the internal database profile conditionally (non-destructively).
+        Orchestrates loading user profile, fetching external payload, persisting the raw
+        snapshot, parsing metrics, and updating the internal profile conditionally.
         """
         # 1. Retrieve the profile from database
         profile = await self.profile_repo.get_by_user_id(user_id)
@@ -33,7 +41,11 @@ class LeetCodeSyncService:
         # 2. Fetch raw payload from client (errors propagate)
         raw_payload = await self.leetcode_client.fetch_raw_data(username)
         
-        # 3. Parse and validate the raw payload (validation errors raise PlatformValidationException)
+        # 3. Create and Commit raw snapshot (Option A - committed first)
+        snapshot = LeetCodeSnapshot(user_id=user_id, raw_data=raw_payload)
+        await self.snapshot_repo.create(snapshot)
+        
+        # 4. Parse and validate the raw payload (validation errors raise PlatformValidationException)
         parsed_data = LeetCodeDataParser.parse(raw_payload)
         
         # 4. Compare and update profile fields non-destructively

@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from app.models.profile import Profile
+from app.models.leetcode_snapshot import LeetCodeSnapshot
 from app.repositories.profile import ProfileRepository
+from app.repositories.leetcode_snapshot import LeetCodeSnapshotRepository
 from app.services.integrations.leetcode import LeetCodeClient
 from app.services.integrations.leetcode_parser import LeetCodeDataParser
 from app.services.integrations.leetcode_sync import LeetCodeSyncService
@@ -14,6 +16,15 @@ from app.utils.exceptions import (
     PlatformValidationException,
     PlatformClientException,
 )
+
+# --- Pytest Fixtures ---
+
+@pytest.fixture
+def mock_snapshot_repo() -> MagicMock:
+    """Fixture returning a mocked LeetCodeSnapshotRepository."""
+    repo = MagicMock(spec=LeetCodeSnapshotRepository)
+    repo.create = AsyncMock(side_effect=lambda x: x)
+    return repo
 
 # --- LeetCodeDataParser Tests ---
 
@@ -172,31 +183,31 @@ def test_parser_malformed_payload_raises_validation() -> None:
 # --- LeetCodeSyncService Tests ---
 
 @pytest.mark.asyncio
-async def test_sync_missing_profile_raises_not_connected() -> None:
+async def test_sync_missing_profile_raises_not_connected(mock_snapshot_repo: MagicMock) -> None:
     """Verify that user without profile raises PlatformNotConnectedException."""
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=None)
     leetcode_client = MagicMock(spec=LeetCodeClient)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     with pytest.raises(PlatformNotConnectedException):
         await service.sync_leetcode_data(uuid.uuid4())
 
 @pytest.mark.asyncio
-async def test_sync_missing_leetcode_username_raises_not_connected() -> None:
+async def test_sync_missing_leetcode_username_raises_not_connected(mock_snapshot_repo: MagicMock) -> None:
     """Verify that profile without connected leetcode_username raises PlatformNotConnectedException."""
     profile = Profile(user_id=uuid.uuid4(), leetcode_username=None)
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=profile)
     leetcode_client = MagicMock(spec=LeetCodeClient)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     with pytest.raises(PlatformNotConnectedException):
         await service.sync_leetcode_data(profile.user_id)
 
 @pytest.mark.asyncio
-async def test_sync_success_profile_updated() -> None:
-    """Verify that new non-null LeetCode bio/avatar values update the database Profile."""
+async def test_sync_success_profile_updated(mock_snapshot_repo: MagicMock) -> None:
+    """Verify that new non-null LeetCode bio/avatar values update the database Profile and create snapshot."""
     profile = Profile(
         user_id=uuid.uuid4(),
         leetcode_username="leetcode_test",
@@ -227,7 +238,7 @@ async def test_sync_success_profile_updated() -> None:
     }
     leetcode_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     result = await service.sync_leetcode_data(profile.user_id)
     
     assert result.success is True
@@ -237,9 +248,10 @@ async def test_sync_success_profile_updated() -> None:
     assert profile.bio == "New Bio from LeetCode"
     assert profile.avatar_url == "https://new.com/avatar.png"
     profile_repo.update.assert_called_once_with(profile)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_partial_update_only_bio_changes() -> None:
+async def test_sync_partial_update_only_bio_changes(mock_snapshot_repo: MagicMock) -> None:
     """Verify update is triggered when only the bio field changes."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -271,15 +283,16 @@ async def test_sync_partial_update_only_bio_changes() -> None:
     }
     leetcode_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     result = await service.sync_leetcode_data(profile.user_id)
     
     assert result.profile_updated is True
     assert profile.bio == "New Bio Only"
     profile_repo.update.assert_called_once_with(profile)
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_null_values_preserved() -> None:
+async def test_sync_null_values_preserved(mock_snapshot_repo: MagicMock) -> None:
     """Verify that incoming null values from LeetCode do not erase existing local profile values."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -311,16 +324,17 @@ async def test_sync_null_values_preserved() -> None:
     }
     leetcode_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     result = await service.sync_leetcode_data(profile.user_id)
     
     assert result.profile_updated is False
     assert profile.bio == "Valuable Bio"
     assert profile.avatar_url == "https://valuable.com/avatar.png"
     profile_repo.update.assert_not_called()
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_idempotent_no_writes() -> None:
+async def test_sync_idempotent_no_writes(mock_snapshot_repo: MagicMock) -> None:
     """Verify that identical data triggers no database updates."""
     profile = Profile(
         user_id=uuid.uuid4(),
@@ -352,15 +366,16 @@ async def test_sync_idempotent_no_writes() -> None:
     }
     leetcode_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     result = await service.sync_leetcode_data(profile.user_id)
     
     assert result.profile_updated is False
     profile_repo.update.assert_not_called()
+    mock_snapshot_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_sync_client_exceptions_propagate() -> None:
-    """Verify that client exceptions propagate without being swallowed."""
+async def test_sync_client_exceptions_propagate(mock_snapshot_repo: MagicMock) -> None:
+    """Verify that client exceptions propagate without being swallowed and do not write snapshots."""
     profile = Profile(user_id=uuid.uuid4(), leetcode_username="leetcode_test")
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=profile)
@@ -368,21 +383,27 @@ async def test_sync_client_exceptions_propagate() -> None:
     leetcode_client = MagicMock(spec=LeetCodeClient)
     leetcode_client.fetch_raw_data = AsyncMock(side_effect=PlatformClientException(platform="LeetCode", message="Service Down"))
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     with pytest.raises(PlatformClientException):
         await service.sync_leetcode_data(profile.user_id)
+    mock_snapshot_repo.create.assert_not_called()
 
 @pytest.mark.asyncio
-async def test_sync_parser_exceptions_propagate() -> None:
-    """Verify that parser validation exceptions propagate correctly."""
+async def test_sync_parser_exceptions_propagate_but_preserve_snapshot(mock_snapshot_repo: MagicMock) -> None:
+    """Verify that parser validation exceptions propagate but snapshot is still committed (Option A)."""
     profile = Profile(user_id=uuid.uuid4(), leetcode_username="leetcode_test")
     profile_repo = MagicMock(spec=ProfileRepository)
     profile_repo.get_by_user_id = AsyncMock(return_value=profile)
+    profile_repo.update = AsyncMock()
     
     leetcode_client = MagicMock(spec=LeetCodeClient)
     raw_payload = {"malformed": "structure"}
     leetcode_client.fetch_raw_data = AsyncMock(return_value=raw_payload)
     
-    service = LeetCodeSyncService(profile_repo, leetcode_client)
+    service = LeetCodeSyncService(profile_repo, leetcode_client, mock_snapshot_repo)
     with pytest.raises(PlatformValidationException):
         await service.sync_leetcode_data(profile.user_id)
+        
+    profile_repo.update.assert_not_called()
+    # In separate transaction stages (Option A), snapshot is still committed
+    mock_snapshot_repo.create.assert_called_once()

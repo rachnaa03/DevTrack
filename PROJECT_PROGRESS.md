@@ -43,10 +43,10 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Implement GitHub HTTP Client Adapter (Task 5.1)
   - [x] Create GitHub Data Parser & Synchronization Service (Task 5.2)
   - [x] Design GitHub Raw Snapshot Model & Storage (Task 5.3)
-- [/] Implement LeetCode GraphQL Client Adapter and Ingestion Services
+- [x] Implement LeetCode GraphQL Client Adapter and Ingestion Services
   - [x] Implement LeetCode GraphQL Client Adapter (Task 6.1)
   - [x] Create LeetCode Data Parser & Synchronization Service (Task 6.2)
-  - [ ] Design LeetCode Raw Snapshot Model & Storage (Task 6.3)
+  - [x] Design LeetCode Raw Snapshot Model & Storage (Task 6.3)
 - [ ] Setup Daily Platform History Tables
 - [ ] Implement Delta Trend Queries
 

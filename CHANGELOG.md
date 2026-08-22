@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Designed `LeetCodeSnapshot` SQLAlchemy model in `app/models/leetcode_snapshot.py` and `LeetCodeSnapshotRepository` in `app/repositories/leetcode_snapshot.py` supporting postgres `JSONB` daily raw API backups.
+- Configured a database migration script `185f6bbb7554_create_leetcode_snapshots_table.py` using Alembic and registered relationships on the `User` model.
+- Integrated Option A stage-wise transaction flow into `LeetCodeSyncService` to commit raw payloads prior to parsing.
+- Created repository/model unit tests in `tests/services/integrations/test_leetcode_snapshot.py` and extended existing integration tests in `tests/services/integrations/test_leetcode_sync.py` to check snapshot limits, cascades, and transaction boundaries.
 - Designed and implemented `LeetCodeClient` HTTP adapter in `app/services/integrations/leetcode.py` issuing GraphQL query POST requests with retry and sliding-window rate limit handlers.
 - Implemented `LeetCodeDataParser` in `app/services/integrations/leetcode_parser.py` validating raw GraphQL payloads against deep Pydantic schemas and deriving totals when "All" is missing.
 - Implemented `LeetCodeSyncService` in `app/services/integrations/leetcode_sync.py` orchestrating LeetCode data sync and non-destructively updating local database profiles.
