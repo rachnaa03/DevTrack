@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Designed `GitHubHistory` SQLAlchemy model in `app/models/github_history.py` and `LeetCodeHistory` SQLAlchemy model in `app/models/leetcode_history.py` representing structured historical metrics.
+- Created unique constraints `uq_github_histories_user_date` and `uq_leetcode_histories_user_date` and composite indexes `idx_github_histories_user_date` and `idx_leetcode_histories_user_date` supporting fast daily queries.
+- Configured a database migration script `bf37cdd39cb0_create_history_tables.py` using Alembic and registered relationships on the `User` model.
 - Designed `LeetCodeSnapshot` SQLAlchemy model in `app/models/leetcode_snapshot.py` and `LeetCodeSnapshotRepository` in `app/repositories/leetcode_snapshot.py` supporting postgres `JSONB` daily raw API backups.
 - Configured a database migration script `185f6bbb7554_create_leetcode_snapshots_table.py` using Alembic and registered relationships on the `User` model.
 - Integrated Option A stage-wise transaction flow into `LeetCodeSyncService` to commit raw payloads prior to parsing.

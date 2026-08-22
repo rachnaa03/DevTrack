@@ -47,7 +47,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Implement LeetCode GraphQL Client Adapter (Task 6.1)
   - [x] Create LeetCode Data Parser & Synchronization Service (Task 6.2)
   - [x] Design LeetCode Raw Snapshot Model & Storage (Task 6.3)
-- [ ] Setup Daily Platform History Tables
+- [x] Setup Daily Platform History Tables (Task 7.1)
 - [ ] Implement Delta Trend Queries
 
 ### 5. Analytics & Engines

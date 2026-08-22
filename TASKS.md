@@ -33,7 +33,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 6.1** | Completed | Implement LeetCode GraphQL Client Adapter | `14a31c6` | Implemented LeetCodeClient HTTP adapter with GraphQL query mapping and transient retry handlers. |
 | **Task 6.2** | Completed | Create LeetCode Data Parser & Synchronization Service | `dea0445` | Implemented LeetCodeDataParser and LeetCodeSyncService with non-destructive, idempotent profile updates. |
 | **Task 6.3** | Completed | Design LeetCode Raw Snapshot Model & Storage | `d835181` | Designed LeetCodeSnapshot SQLAlchemy model, repository, and integrated separate stage persistence. |
-| **Task 7.1** | Pending | Create Structured GitHub and LeetCode History Tables | *Pending* | |
+| **Task 7.1** | Completed | Create Structured GitHub and LeetCode History Tables | `3c73999` | Created GitHubHistory and LeetCodeHistory models and migrated schema. |
 | **Task 7.2** | Pending | Implement History CRUD Repository Services | *Pending* | |
 | **Task 7.3** | Pending | Implement Trend Query Engine | *Pending* | |
 | **Task 8.1** | Pending | Develop GitHub Analyzer Service | *Pending* | |
