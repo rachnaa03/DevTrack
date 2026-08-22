@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any, Mapping, Optional, TypeVar
-from pydantic import BaseModel, StrictInt, ValidationError
+from pydantic import BaseModel, StrictInt, ValidationError, Field
 from app.utils.exceptions import PlatformValidationException
 
 T = TypeVar("T", bound=BaseModel)
@@ -56,4 +56,55 @@ class GitHubSyncResult(BaseModel):
     github_username: str
     repositories_fetched: int
     repositories_parsed: int
+    profile_updated: bool
+
+class LeetCodeUserProfileSchema(BaseModel):
+    """Schema for validating LeetCode user profile details."""
+    realName: Optional[str] = None
+    aboutMe: Optional[str] = None
+    userAvatar: Optional[str] = None
+
+class LeetCodeAcSubmissionSchema(BaseModel):
+    """Schema for validating LeetCode accepted submission count per difficulty."""
+    difficulty: str
+    count: int
+    submissions: int
+
+class LeetCodeSubmitStatsSchema(BaseModel):
+    """Schema for validating LeetCode submission statistics."""
+    acSubmissionNum: list[LeetCodeAcSubmissionSchema]
+
+class LeetCodeTagSolvedSchema(BaseModel):
+    """Schema for validating LeetCode tag solved count details."""
+    tagName: str
+    tagSlug: str
+    solvedCount: int
+
+class LeetCodeTagProblemsSolvedSchema(BaseModel):
+    """Schema for validating LeetCode tag groups."""
+    fundamental: list[LeetCodeTagSolvedSchema] = Field(default_factory=list)
+    intermediate: list[LeetCodeTagSolvedSchema] = Field(default_factory=list)
+    advanced: list[LeetCodeTagSolvedSchema] = Field(default_factory=list)
+
+class LeetCodeMatchedUserSchema(BaseModel):
+    """Schema for validating LeetCode matchedUser payload details."""
+    username: str
+    profile: Optional[LeetCodeUserProfileSchema] = None
+    submitStats: LeetCodeSubmitStatsSchema
+    tagProblemsSolved: Optional[LeetCodeTagProblemsSolvedSchema] = None
+
+class LeetCodeDataContainerSchema(BaseModel):
+    """Container schema for matchedUser."""
+    matchedUser: Optional[LeetCodeMatchedUserSchema] = None
+
+class LeetCodeResponseSchema(BaseModel):
+    """Schema for validating LeetCode full GraphQL response payload."""
+    data: LeetCodeDataContainerSchema
+
+class LeetCodeSyncResult(BaseModel):
+    """Result schema detailing execution metrics of the LeetCode synchronization."""
+    success: bool
+    timestamp: datetime
+    leetcode_username: str
+    problems_solved: int
     profile_updated: bool

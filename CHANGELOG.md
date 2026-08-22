@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Designed and implemented `LeetCodeClient` HTTP adapter in `app/services/integrations/leetcode.py` issuing GraphQL query POST requests with retry and sliding-window rate limit handlers.
+- Implemented `LeetCodeDataParser` in `app/services/integrations/leetcode_parser.py` validating raw GraphQL payloads against deep Pydantic schemas and deriving totals when "All" is missing.
+- Implemented `LeetCodeSyncService` in `app/services/integrations/leetcode_sync.py` orchestrating LeetCode data sync and non-destructively updating local database profiles.
+- Extended the test suite in `tests/services/integrations/test_leetcode_sync.py` covering parser counts, Tag lists, nonexistent handles, profile updates, and idempotency states.
 - Created `LeetCodeClient` test suite in `tests/services/integrations/test_leetcode_client.py` covering success responses, nonexistent users, rate-limits, GraphQL failures, timeouts, and transient errors.
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
 - Designed `GitHubSnapshot` SQLAlchemy model in `app/models/github_snapshot.py` and `GitHubSnapshotRepository` in `app/repositories/github_snapshot.py` supporting postgres `JSONB` daily raw API backups.
