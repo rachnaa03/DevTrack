@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     
     # External Platform Integration Settings
     GITHUB_API_TOKEN: str | None = None
+    GITHUB_API_URL: str = "https://api.github.com"
+    GITHUB_RATE_LIMIT_AUTH: int = 5000
+    GITHUB_RATE_LIMIT_UNAUTH: int = 60
+    GITHUB_RATE_LIMIT_OVERRIDE: int | None = None
+    GITHUB_RATE_LIMIT_PERIOD: float = 3600.0
     SYNC_INTERVAL_HOURS: int = 12
 
     model_config = SettingsConfigDict(

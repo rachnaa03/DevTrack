@@ -40,3 +40,52 @@ class PlatformValidationException(DevTrackException):
             message=f"Validation failed for {platform} data: {details}",
             status_code=502
         )
+
+class PlatformException(DevTrackException):
+    """Base exception class for platform integration errors."""
+    pass
+
+class PlatformUserNotFoundException(PlatformException):
+    """Raised when the username/resource is not found on the platform (HTTP 404)."""
+    def __init__(self, platform: str, username: str) -> None:
+        super().__init__(
+            code="PLATFORM_USER_NOT_FOUND",
+            message=f"User '{username}' was not found on {platform}.",
+            status_code=404
+        )
+
+class PlatformRateLimitException(PlatformException):
+    """Raised when the platform API rate limit is exceeded (HTTP 429)."""
+    def __init__(self, platform: str) -> None:
+        super().__init__(
+            code="PLATFORM_RATE_LIMIT_EXCEEDED",
+            message=f"Rate limit exceeded on {platform}.",
+            status_code=429
+        )
+
+class PlatformAuthException(PlatformException):
+    """Raised when authentication credentials fail for the downstream platform (HTTP 502)."""
+    def __init__(self, platform: str) -> None:
+        super().__init__(
+            code="PLATFORM_AUTH_FAILED",
+            message=f"Authentication failed with {platform}.",
+            status_code=502
+        )
+
+class PlatformTransientException(PlatformException):
+    """Raised for transient/retryable downstream server/network errors (HTTP 503)."""
+    def __init__(self, platform: str, message: str) -> None:
+        super().__init__(
+            code="PLATFORM_TRANSIENT_ERROR",
+            message=f"Transient error on {platform}: {message}",
+            status_code=503
+        )
+
+class PlatformClientException(PlatformException):
+    """Raised for general network, provider, or unexpected errors (HTTP 502)."""
+    def __init__(self, platform: str, message: str) -> None:
+        super().__init__(
+            code="PLATFORM_ERROR",
+            message=f"{platform} error: {message}",
+            status_code=502
+        )

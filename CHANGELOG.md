@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Designed and implemented `GitHubClient` HTTP client adapter in `app/services/integrations/github.py` with repository pagination, token security boundary headers, and configurable sliding-window rate limit fallbacks.
+- Added custom downstream platform Exceptions (`PlatformUserNotFoundException`, `PlatformRateLimitException`, `PlatformAuthException`, `PlatformTransientException`, `PlatformClientException`) for precise status classifications.
+- Created `GitHubClient` test suite in `tests/services/integrations/test_github_client.py` covering error mapping, transient retries, pagination, and token safety.
 - Designed and implemented `AsyncRateLimiter` (sliding-window async limiter) and `async_retry` (exponential backoff retry decorator) inside `app/services/integrations/helpers.py`.
 - Created comprehensive helper tests in `tests/services/integrations/test_helpers.py` checking validation, concurrency limits, and retry semantics.
 - Created generic synchronization validation helper `validate_platform_data` and custom exception `PlatformValidationException` to format and check external APIs structurally.
