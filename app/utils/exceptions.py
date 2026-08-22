@@ -89,3 +89,13 @@ class PlatformClientException(PlatformException):
             message=f"{platform} error: {message}",
             status_code=502
         )
+
+class PlatformNotConnectedException(DevTrackException):
+    """Raised when attempting to sync a platform that is not connected/linked to the profile."""
+    def __init__(self, platform: str) -> None:
+        super().__init__(
+            code="PLATFORM_NOT_CONNECTED",
+            message=f"No account is connected for platform '{platform}'. Please connect your handle first.",
+            status_code=400
+        )
+

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
+- Implemented `GitHubDataParser` in `app/services/integrations/github_parser.py` validating and converting raw API payloads into strongly-typed models with accumulated metric aggregation.
+- Implemented `GitHubSyncService` in `app/services/integrations/github_sync.py` executing the profile synchronization pipeline with strict null-checking updates and local state constraints.
+- Added custom local business logic exception `PlatformNotConnectedException` for missing platform credentials.
+- Created `GitHubSyncService` test suite in `tests/services/integrations/test_github_sync.py` covering parser types, profile diff updates, idempotency, and database failures.
 - Designed and implemented `GitHubClient` HTTP client adapter in `app/services/integrations/github.py` with repository pagination, token security boundary headers, and configurable sliding-window rate limit fallbacks.
 - Added custom downstream platform Exceptions (`PlatformUserNotFoundException`, `PlatformRateLimitException`, `PlatformAuthException`, `PlatformTransientException`, `PlatformClientException`) for precise status classifications.
 - Created `GitHubClient` test suite in `tests/services/integrations/test_github_client.py` covering error mapping, transient retries, pagination, and token safety.
