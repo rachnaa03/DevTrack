@@ -34,7 +34,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 6.2** | Completed | Create LeetCode Data Parser & Synchronization Service | `dea0445` | Implemented LeetCodeDataParser and LeetCodeSyncService with non-destructive, idempotent profile updates. |
 | **Task 6.3** | Completed | Design LeetCode Raw Snapshot Model & Storage | `d835181` | Designed LeetCodeSnapshot SQLAlchemy model, repository, and integrated separate stage persistence. |
 | **Task 7.1** | Completed | Create Structured GitHub and LeetCode History Tables | `3c73999` | Created GitHubHistory and LeetCodeHistory models and migrated schema. |
-| **Task 7.2** | Pending | Implement History CRUD Repository Services | *Pending* | |
+| **Task 7.2** | Completed | Implement History CRUD Repository Services | `7ad60cf` | Implemented GitHubHistoryRepository and LeetCodeHistoryRepository with PostgreSQL native upserts. |
 | **Task 7.3** | Pending | Implement Trend Query Engine | *Pending* | |
 | **Task 8.1** | Pending | Develop GitHub Analyzer Service | *Pending* | |
 | **Task 8.2** | Pending | Develop LeetCode Analyzer Service | *Pending* | |
