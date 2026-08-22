@@ -87,3 +87,22 @@ class GitHubHistoryRepository:
         )
         result = await self.db.execute(query)
         return result.scalars().first()
+
+    async def get_recent_by_user_id(
+        self,
+        user_id: UUID,
+        limit: int = 2
+    ) -> list[GitHubHistory]:
+        """
+        Retrieve the user's most recent history records sorted by date descending.
+        """
+        if limit <= 0:
+            raise ValueError("Limit must be greater than zero.")
+        query = (
+            select(GitHubHistory)
+            .filter(GitHubHistory.user_id == user_id)
+            .order_by(GitHubHistory.date.desc())
+            .limit(limit)
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())

@@ -35,7 +35,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 6.3** | Completed | Design LeetCode Raw Snapshot Model & Storage | `d835181` | Designed LeetCodeSnapshot SQLAlchemy model, repository, and integrated separate stage persistence. |
 | **Task 7.1** | Completed | Create Structured GitHub and LeetCode History Tables | `3c73999` | Created GitHubHistory and LeetCodeHistory models and migrated schema. |
 | **Task 7.2** | Completed | Implement History CRUD Repository Services | `7ad60cf` | Implemented GitHubHistoryRepository and LeetCodeHistoryRepository with PostgreSQL native upserts. |
-| **Task 7.3** | Pending | Implement Trend Query Engine | *Pending* | |
+| **Task 7.3** | Completed | Implement Trend Query Engine | `b2a2915` | Implemented TrendQueryEngine service, Pydantic schemas, and added optimized repository lookups. |
 | **Task 8.1** | Pending | Develop GitHub Analyzer Service | *Pending* | |
 | **Task 8.2** | Pending | Develop LeetCode Analyzer Service | *Pending* | |
 | **Task 8.3** | Pending | Create Analytics Database Storage & Migration | *Pending* | |

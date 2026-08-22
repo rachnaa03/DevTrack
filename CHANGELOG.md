@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `TrendQueryEngine` service in `app/services/analytics/trends.py` coordinating historical query range retrievals and metric trend calculations.
+- Added typed Pydantic models for metric deltas in `app/schemas/trends.py`.
+- Added optimized database method `get_recent_by_user_id` to both `GitHubHistoryRepository` and `LeetCodeHistoryRepository`.
+- Added `InvalidMetricException` to `app/utils/exceptions.py` raising custom HTTP 400 validation error for unsupported metrics.
+- Created Trend Query Engine mock unit tests in `tests/services/analytics/test_trends.py`.
 - Implemented `GitHubHistoryRepository` in `app/repositories/github_history.py` and `LeetCodeHistoryRepository` in `app/repositories/leetcode_history.py` utilizing PostgreSQL-native `ON CONFLICT DO UPDATE` for atomic daily upserts.
 - Added repository unit tests for both history repositories under `tests/repositories/` verifying create/upsert, date filtering, ordering, and transaction rollbacks.
 - Designed `GitHubHistory` SQLAlchemy model in `app/models/github_history.py` and `LeetCodeHistory` SQLAlchemy model in `app/models/leetcode_history.py` representing structured historical metrics.

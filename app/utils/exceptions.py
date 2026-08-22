@@ -99,3 +99,12 @@ class PlatformNotConnectedException(DevTrackException):
             status_code=400
         )
 
+class InvalidMetricException(DevTrackException):
+    """Raised when an unsupported metric name is requested from the Trend Query Engine."""
+    def __init__(self, platform: str, metric: str) -> None:
+        super().__init__(
+            code="INVALID_METRIC",
+            message=f"Metric '{metric}' is not supported for platform '{platform}'.",
+            status_code=400
+        )
+
