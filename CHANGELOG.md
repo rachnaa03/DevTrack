@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Designed and implemented `LeetCodeClient` HTTP adapter in `app/services/integrations/leetcode.py` issuing GraphQL query POST requests with retry and sliding-window rate limit handlers.
+- Created `LeetCodeClient` test suite in `tests/services/integrations/test_leetcode_client.py` covering success responses, nonexistent users, rate-limits, GraphQL failures, timeouts, and transient errors.
 - Implemented `/api/v1/health` endpoint to monitor application liveness and PostgreSQL readiness.
 - Designed `GitHubSnapshot` SQLAlchemy model in `app/models/github_snapshot.py` and `GitHubSnapshotRepository` in `app/repositories/github_snapshot.py` supporting postgres `JSONB` daily raw API backups.
 - Configured a database migration script `914773fe5de6_create_github_snapshots_table.py` using Alembic and registered relationships on the `User` model.

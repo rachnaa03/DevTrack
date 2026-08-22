@@ -3,6 +3,7 @@ from app.services.integrations.helpers import AsyncRateLimiter, async_retry
 from app.services.integrations.github import GitHubClient
 from app.services.integrations.github_parser import GitHubDataParser
 from app.services.integrations.github_sync import GitHubSyncService
+from app.services.integrations.leetcode import LeetCodeClient
 
 __all__ = [
     "BasePlatformClient",
@@ -11,6 +12,7 @@ __all__ = [
     "GitHubClient",
     "GitHubDataParser",
     "GitHubSyncService",
+    "LeetCodeClient",
 ]
 
 

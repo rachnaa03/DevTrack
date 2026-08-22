@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     GITHUB_RATE_LIMIT_UNAUTH: int = 60
     GITHUB_RATE_LIMIT_OVERRIDE: int | None = None
     GITHUB_RATE_LIMIT_PERIOD: float = 3600.0
+    
+    LEETCODE_API_URL: str = "https://leetcode.com/graphql"
+    LEETCODE_RATE_LIMIT_MAX: int = 60
+    LEETCODE_RATE_LIMIT_OVERRIDE: int | None = None
+    LEETCODE_RATE_LIMIT_PERIOD: float = 3600.0
+    
     SYNC_INTERVAL_HOURS: int = 12
 
     model_config = SettingsConfigDict(
