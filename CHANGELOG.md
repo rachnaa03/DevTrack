@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented pure comparison rules evaluator `AnalyticsComparator` in `app/services/insights/rules.py` for evaluating progress changes in coding output, consistency, difficulty progression, streaks, and score changes.
+- Added structured output Pydantic schemas in `app/schemas/insights.py` to decouple comparison triggers from database persistence models.
+- Added unit tests in `tests/services/insights/test_rules.py` covering increase/decrease thresholds, zero baselines, null handling, and scoring category metrics.
 - Implemented `DeveloperScoreService` in `app/services/scoring/service.py` to calculate and record historical score records.
 - Implemented `DeveloperScoreRepository` in `app/repositories/score.py` encapsulating queries and score persistence.
 - Added repository and service tests verifying score calculations, combinations, retrieval, and transaction failures.
