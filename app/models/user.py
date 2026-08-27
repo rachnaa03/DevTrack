@@ -75,6 +75,20 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # 1:N relationship mapping pointing to GitHub analytics
+    github_analytics: Mapped[list["GitHubAnalytics"]] = relationship(
+        "GitHubAnalytics",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # 1:N relationship mapping pointing to LeetCode analytics
+    leetcode_analytics: Mapped[list["LeetCodeAnalytics"]] = relationship(
+        "LeetCodeAnalytics",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_users_email", "email", unique=True),
     )
