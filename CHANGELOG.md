@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Created separate `github_analytics` and `leetcode_analytics` database tables to persist computed developer metrics independently.
+- Created `GitHubAnalyticsRepository` and `LeetCodeAnalyticsRepository` encapsulating database queries and same-day upserts.
+- Generated database schema migration and added repository tests.
 - Implemented `LeetCodeAnalyzer` service in `app/services/analytics/leetcode.py` for computing comprehensive difficulty statistics, topic shares, growth deltas, observed daily consistency/frequency metrics, and contribution streaks.
 - Added typed Pydantic models for LeetCode analysis results in `app/schemas/leetcode_analysis.py`.
 - Added unit tests in `tests/services/analytics/test_leetcode_analyzer.py` verifying snapshot missing states, topic deduplication, growth, observed transitions, and streak boundaries.
