@@ -40,7 +40,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 8.2** | Completed | Develop LeetCode Analyzer Service | `9576255` | Implemented LeetCodeAnalyzer service, Pydantic schemas, and comprehensive unit tests. |
 | **Task 8.3** | Completed | Create Analytics Database Storage & Migration | `4acc1ac` | Designed github_analytics and leetcode_analytics tables, created Alembic migration, and implemented repository layers. |
 | **Task 9.1** | Completed | Design and Implement Weighted Developer Scoring Rules | `0e87cc9` | Implemented DeveloperScoreCalculator service, Pydantic schemas, and comprehensive unit tests. |
-| **Task 9.2** | Pending | Implement Score History Model & Schema Migration | *Pending* | |
+| **Task 9.2** | Completed | Implement Score History Model & Schema Migration | `80a57da` | Created DeveloperScore SQLAlchemy model, users mapping, and Alembic database migration. |
 | **Task 9.3** | Pending | Develop Score Recording Service | *Pending* | |
 | **Task 10.1** | Pending | Write Rule-Based Comparison Algorithms | *Pending* | |
 | **Task 10.2** | Pending | Create Insights Database Model & Migration | *Pending* | |
