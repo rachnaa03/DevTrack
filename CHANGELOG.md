@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `DeveloperScoreService` in `app/services/scoring/service.py` to calculate and record historical score records.
+- Implemented `DeveloperScoreRepository` in `app/repositories/score.py` encapsulating queries and score persistence.
+- Added repository and service tests verifying score calculations, combinations, retrieval, and transaction failures.
 - Created `developer_scores` database table and matching `DeveloperScore` SQLAlchemy model to store historical developer score computations.
 - Generated database schema migration for developer score tracking.
 - Implemented pure `DeveloperScoreCalculator` in `app/services/scoring/calculator.py` for computing the rule-based Developer Score v1 out of 1000.

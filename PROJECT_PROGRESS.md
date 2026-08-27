@@ -55,9 +55,10 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Develop GitHub Analyzer Service (Task 8.1)
   - [x] Develop LeetCode Analyzer Service (Task 8.2)
   - [x] Create Analytics Database Storage & Migration (Task 8.3)
-- [/] Implement Weighted Scoring Algorithm (Consistency, Depth, Impact)
+- [x] Implement Weighted Scoring Algorithm (Consistency, Depth, Impact)
   - [x] Design and Implement Weighted Developer Scoring Rules (Task 9.1)
   - [x] Implement Score History Model & Schema Migration (Task 9.2)
+  - [x] Develop Score Recording Service (Task 9.3)
 - [ ] Build Rule-Based Insights Engine (Delta Snapshots comparison)
 - [ ] Build Rule-Based Recommendations Engine
 
