@@ -51,7 +51,9 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Implement Delta Trend Queries (Task 7.3)
 
 ### 5. Analytics & Engines
-- [ ] Build Developer Analytics Engine (GitHub/LeetCode Analyzers)
+- [/] Build Developer Analytics Engine
+  - [x] Develop GitHub Analyzer Service (Task 8.1)
+  - [ ] Develop LeetCode Analyzer Service (Task 8.2)
 - [ ] Implement Weighted Scoring Algorithm (Consistency, Depth, Impact)
 - [ ] Build Rule-Based Insights Engine (Delta Snapshots comparison)
 - [ ] Build Rule-Based Recommendations Engine
