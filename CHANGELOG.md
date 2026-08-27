@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented pure `DeveloperScoreCalculator` in `app/services/scoring/calculator.py` for computing the rule-based Developer Score v1 out of 1000.
+- Added typed Pydantic models for Developer Score result and subcomponent breakdown in `app/schemas/score.py`.
+- Added unit tests in `tests/services/scoring/test_calculator.py` covering all scoring combinations and boundaries.
 - Created separate `github_analytics` and `leetcode_analytics` database tables to persist computed developer metrics independently.
 - Created `GitHubAnalyticsRepository` and `LeetCodeAnalyticsRepository` encapsulating database queries and same-day upserts.
 - Generated database schema migration and added repository tests.
