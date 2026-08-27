@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `GitHubAnalyzer` service in `app/services/analytics/github.py` for computing comprehensive repository volume statistics, language shares, growth deltas, and contribution streaks.
+- Added typed Pydantic models for GitHub analysis results in `app/schemas/github_analysis.py`.
+- Added unit tests in `tests/services/analytics/test_github_analyzer.py` verifying snapshot failures, sorting stability, growth ranges, observed-day frequency/consistency, and stale/ambiguous current/longest streak behaviors.
 - Implemented `TrendQueryEngine` service in `app/services/analytics/trends.py` coordinating historical query range retrievals and metric trend calculations.
 - Added typed Pydantic models for metric deltas in `app/schemas/trends.py`.
 - Added optimized database method `get_recent_by_user_id` to both `GitHubHistoryRepository` and `LeetCodeHistoryRepository`.
