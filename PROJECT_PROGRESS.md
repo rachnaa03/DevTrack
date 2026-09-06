@@ -59,9 +59,13 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Design and Implement Weighted Developer Scoring Rules (Task 9.1)
   - [x] Implement Score History Model & Schema Migration (Task 9.2)
   - [x] Develop Score Recording Service (Task 9.3)
-- [/] Build Rule-Based Insights Engine (Delta Snapshots comparison)
+- [x] Build Rule-Based Insights Engine (Delta Snapshots comparison)
   - [x] Write Rule-Based Comparison Algorithms (Task 10.1)
-- [ ] Build Rule-Based Recommendations Engine
+  - [x] Create Insights Database Model & Migration (Task 10.2)
+  - [x] Create Insights Generation Service (Task 10.3)
+- [/] Build Rule-Based Recommendations Engine
+  - [x] Design Rule-Based Recommendation Algorithms (Task 11.1)
+  - [x] Create Recommendations Database Model & Migration (Task 11.2)
 
 ### 6. Dashboard & Scheduler
 - [ ] Implement Dashboard Summary API Endpoint
