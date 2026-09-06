@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented authenticated Dashboard Summary API endpoint `GET /api/v1/dashboard/summary` providing unified Developer Score metrics and platform statistics for GitHub and LeetCode.
+- Created typed Pydantic response models in `app/schemas/dashboard.py` (`DashboardSummaryResponse`, `DashboardScoreSchema`, `DashboardStatsSchema`, `DashboardGitHubStatsSchema`, `DashboardLeetCodeStatsSchema`) ensuring null-safe representations of unpopulated platforms.
+- Implemented read-only `DashboardSummaryService` in `app/services/dashboard/summary.py` assembling latest Developer Score, GitHub, and LeetCode analytics without mutating state or duplicating business calculations.
+- Integrated dashboard router in `app/main.py` under prefix `/api/v1/dashboard`.
+- Added pure unit tests in `tests/services/dashboard/test_dashboard_summary.py` and endpoint integration tests in `tests/api/test_dashboard_api.py`.
 - Implemented pure comparison rules evaluator `AnalyticsComparator` in `app/services/insights/rules.py` for evaluating progress changes in coding output, consistency, difficulty progression, streaks, and score changes.
 - Added structured output Pydantic schemas in `app/schemas/insights.py` to decouple comparison triggers from database persistence models.
 - Added unit tests in `tests/services/insights/test_rules.py` covering increase/decrease thresholds, zero baselines, null handling, and scoring category metrics.
