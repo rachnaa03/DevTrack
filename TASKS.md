@@ -49,7 +49,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 11.2** | Completed | Create Recommendations Database Model & Migration | `2f26d60` | Created Recommendation SQLAlchemy model, uniqueness constraint on (user_id, rule_id, rule_version), JSONB evidence, status lifecycle, Alembic migration. |
 | **Task 11.3** | Completed | Create Recommendation Orchestrator Service | `41bdc3d` | Implemented RecommendationRepository, RecommendationService with idempotency and stale-resolution, RecommendationRunResultSchema, and 28 unit tests. |
 | **Task 12.1** | Completed | Implement Dashboard Summary API Endpoint | `be624b8` | Implemented GET /api/v1/dashboard/summary endpoint, Pydantic schemas, DashboardSummaryService orchestration, and full test suite. |
-| **Task 12.2** | Pending | Implement Historical Charts APIs | *Pending* | |
+| **Task 12.2** | Completed | Implement Historical Charts APIs | `8314767` | Implemented GET /api/v1/dashboard/charts endpoint, Pydantic schemas, DashboardChartService history aggregation, and unit/integration tests. |
 | **Task 12.3** | Pending | Implement Milestone Badges and Timeline Endpoints | *Pending* | |
 | **Task 13.1** | Pending | Integrate APScheduler in FastAPI Lifespan | *Pending* | |
 | **Task 13.2** | Pending | Implement Synchronizer Orchestrator Workflow | *Pending* | |
