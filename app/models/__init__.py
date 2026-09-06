@@ -7,6 +7,8 @@ from app.models.leetcode_history import LeetCodeHistory
 from app.models.github_analytics import GitHubAnalytics
 from app.models.leetcode_analytics import LeetCodeAnalytics
 from app.models.score import DeveloperScore
+from app.models.insight import Insight
+from app.models.recommendation import Recommendation
 
 __all__ = [
     "User",
@@ -17,8 +19,7 @@ __all__ = [
     "LeetCodeHistory",
     "GitHubAnalytics",
     "LeetCodeAnalytics",
-    "DeveloperScore"
+    "DeveloperScore",
+    "Insight",
+    "Recommendation",
 ]
-
-
-

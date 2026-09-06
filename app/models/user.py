@@ -96,6 +96,20 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # 1:N relationship mapping pointing to Insights
+    insights: Mapped[list["Insight"]] = relationship(
+        "Insight",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # 1:N relationship mapping pointing to Recommendations
+    recommendations: Mapped[list["Recommendation"]] = relationship(
+        "Recommendation",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_users_email", "email", unique=True),
     )
