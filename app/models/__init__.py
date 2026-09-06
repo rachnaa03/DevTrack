@@ -9,6 +9,8 @@ from app.models.leetcode_analytics import LeetCodeAnalytics
 from app.models.score import DeveloperScore
 from app.models.insight import Insight
 from app.models.recommendation import Recommendation
+from app.models.timeline_event import TimelineEvent
+from app.models.milestone import Milestone
 
 __all__ = [
     "User",
@@ -22,4 +24,6 @@ __all__ = [
     "DeveloperScore",
     "Insight",
     "Recommendation",
+    "TimelineEvent",
+    "Milestone",
 ]

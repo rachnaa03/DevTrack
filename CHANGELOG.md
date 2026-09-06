@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented authenticated Timeline Events endpoint `GET /api/v1/dashboard/timeline` and Milestone Badges endpoint `GET /api/v1/dashboard/milestones`.
+- Designed `TimelineEvent` and `Milestone` SQLAlchemy models in `app/models/timeline_event.py` and `app/models/milestone.py` and generated Alembic database schema migration `b2c3d4e5f6a7_create_timeline_and_milestones_tables.py`.
+- Implemented `TimelineRepository` in `app/repositories/timeline.py` and `MilestoneRepository` in `app/repositories/milestone.py`.
+- Created deterministic `MilestoneEvaluator` and `MilestoneService` in `app/services/dashboard/milestones.py` and `TimelineService` in `app/services/dashboard/timeline.py`.
+- Added typed Pydantic response models in `app/schemas/dashboard.py` (`TimelineEventSchema`, `TimelineEventsResponse`, `MilestoneSchema`, `MilestonesResponse`).
+- Added comprehensive unit tests in `tests/services/dashboard/test_dashboard_milestones.py`, `tests/services/dashboard/test_dashboard_timeline.py`, and integration tests in `tests/api/test_dashboard_api.py`.
 - Implemented authenticated Historical Charts API endpoint `GET /api/v1/dashboard/charts` returning daily chronological time series of GitHub commits and LeetCode problems solved with configurable lookback interval filter.
 - Created typed Pydantic response models in `app/schemas/dashboard.py` (`DashboardChartPointSchema`, `DashboardChartsResponse`) formatting multi-platform metrics cleanly for frontend charts.
 - Implemented `DashboardChartService` in `app/services/dashboard/charts.py` querying and merging time-series records from `GitHubHistoryRepository` and `LeetCodeHistoryRepository`.

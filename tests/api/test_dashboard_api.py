@@ -1,5 +1,5 @@
 """
-Integration tests for Dashboard API endpoints (Tasks 12.1 & 12.2).
+Integration tests for Dashboard API endpoints (Tasks 12.1, 12.2 & 12.3).
 
 Tests:
 Summary:
@@ -14,6 +14,18 @@ Charts:
 - GET /api/v1/dashboard/charts (200 OK — empty dataset)
 - GET /api/v1/dashboard/charts (401 Unauthorized — missing token)
 - GET /api/v1/dashboard/charts (422 Unprocessable Content — invalid days filter)
+
+Timeline:
+- GET /api/v1/dashboard/timeline (200 OK — default limit=20)
+- GET /api/v1/dashboard/timeline (200 OK — custom limit parameter)
+- GET /api/v1/dashboard/timeline (200 OK — empty events)
+- GET /api/v1/dashboard/timeline (401 Unauthorized — missing token)
+- GET /api/v1/dashboard/timeline (422 Unprocessable Content — invalid limit)
+
+Milestones:
+- GET /api/v1/dashboard/milestones (200 OK — earned badges)
+- GET /api/v1/dashboard/milestones (200 OK — empty list)
+- GET /api/v1/dashboard/milestones (401 Unauthorized — missing token)
 
 User ownership:
 - Verifies authenticated user ID is passed to services for isolation.
@@ -30,6 +42,8 @@ from fastapi.testclient import TestClient
 from app.api.dashboard.routes import (
     get_dashboard_chart_service,
     get_dashboard_summary_service,
+    get_milestone_service,
+    get_timeline_service,
 )
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
@@ -43,9 +57,15 @@ from app.schemas.dashboard import (
     DashboardScoreSchema,
     DashboardStatsSchema,
     DashboardSummaryResponse,
+    MilestoneSchema,
+    MilestonesResponse,
+    TimelineEventSchema,
+    TimelineEventsResponse,
 )
 from app.services.dashboard.charts import DashboardChartService
+from app.services.dashboard.milestones import MilestoneService
 from app.services.dashboard.summary import DashboardSummaryService
+from app.services.dashboard.timeline import TimelineService
 
 client = TestClient(app)
 
@@ -110,6 +130,40 @@ def sample_charts_response() -> DashboardChartsResponse:
                 problems_solved=1,
             ),
         ],
+    )
+
+
+@pytest.fixture
+def sample_timeline_response() -> TimelineEventsResponse:
+    return TimelineEventsResponse(
+        events=[
+            TimelineEventSchema(
+                event_date=date(2026, 8, 3),
+                event_type="milestone_earned",
+                title="First Hard Problem Solved",
+                description="Solved LeetCode Hard problem: 'Median of Two Sorted Arrays'.",
+            ),
+            TimelineEventSchema(
+                event_date=date(2026, 8, 1),
+                event_type="account_linked",
+                title="GitHub Profile Connected",
+                description="Linked handle 'octocat' to DevTrack profile.",
+            ),
+        ]
+    )
+
+
+@pytest.fixture
+def sample_milestones_response() -> MilestonesResponse:
+    return MilestonesResponse(
+        milestones=[
+            MilestoneSchema(
+                name="Consistency Champion",
+                description="Maintain a LeetCode streak for 5 consecutive days.",
+                badge_url="https://assets.devtrack.com/badges/consistency_5.png",
+                achieved_at=datetime(2026, 8, 3, 12, 0, 0, tzinfo=timezone.utc),
+            )
+        ]
     )
 
 
@@ -328,3 +382,128 @@ def test_get_dashboard_charts_invalid_days_range(mock_user: User) -> None:
         assert res_invalid.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     finally:
         app.dependency_overrides.clear()
+
+
+# ---------------------------------------------------------------------------
+# Task 12.3 — Timeline & Milestones Endpoint Tests
+# ---------------------------------------------------------------------------
+
+def test_get_dashboard_timeline_success(
+    mock_user: User, sample_timeline_response: TimelineEventsResponse
+) -> None:
+    """Verify GET /api/v1/dashboard/timeline returns 200 OK with formatted events."""
+    mock_service = MagicMock(spec=TimelineService)
+    mock_service.get_timeline = AsyncMock(return_value=sample_timeline_response)
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_timeline_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/timeline")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert "events" in data
+        assert len(data["events"]) == 2
+        assert data["events"][0]["event_type"] == "milestone_earned"
+        assert data["events"][0]["title"] == "First Hard Problem Solved"
+        assert data["events"][1]["event_type"] == "account_linked"
+
+        mock_service.get_timeline.assert_awaited_once_with(
+            user_id=mock_user.id, limit=20
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_timeline_custom_limit(
+    mock_user: User, sample_timeline_response: TimelineEventsResponse
+) -> None:
+    """Verify GET /api/v1/dashboard/timeline accepts custom limit query parameter."""
+    mock_service = MagicMock(spec=TimelineService)
+    mock_service.get_timeline = AsyncMock(return_value=sample_timeline_response)
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_timeline_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/timeline?limit=50")
+        assert response.status_code == status.HTTP_200_OK
+        mock_service.get_timeline.assert_awaited_once_with(
+            user_id=mock_user.id, limit=50
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_timeline_invalid_limit(mock_user: User) -> None:
+    """Verify invalid limit parameter returns 422 Unprocessable Content."""
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+
+    try:
+        # limit < 1
+        res_zero = client.get("/api/v1/dashboard/timeline?limit=0")
+        assert res_zero.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+        # limit > 100
+        res_large = client.get("/api/v1/dashboard/timeline?limit=150")
+        assert res_large.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_timeline_unauthorized() -> None:
+    """Verify GET /api/v1/dashboard/timeline returns 401 when no auth token is provided."""
+    response = client.get("/api/v1/dashboard/timeline")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_get_dashboard_milestones_success(
+    mock_user: User, sample_milestones_response: MilestonesResponse
+) -> None:
+    """Verify GET /api/v1/dashboard/milestones returns 200 OK with earned badges."""
+    mock_service = MagicMock(spec=MilestoneService)
+    mock_service.get_milestones = AsyncMock(return_value=sample_milestones_response)
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_milestone_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/milestones")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert "milestones" in data
+        assert len(data["milestones"]) == 1
+        assert data["milestones"][0]["name"] == "Consistency Champion"
+        assert data["milestones"][0]["badge_url"] == "https://assets.devtrack.com/badges/consistency_5.png"
+
+        mock_service.get_milestones.assert_awaited_once_with(user_id=mock_user.id)
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_milestones_empty(mock_user: User) -> None:
+    """Verify GET /api/v1/dashboard/milestones handles empty badge collection."""
+    mock_service = MagicMock(spec=MilestoneService)
+    mock_service.get_milestones = AsyncMock(
+        return_value=MilestonesResponse(milestones=[])
+    )
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_milestone_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/milestones")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert data["milestones"] == []
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_milestones_unauthorized() -> None:
+    """Verify GET /api/v1/dashboard/milestones returns 401 when unauthenticated."""
+    response = client.get("/api/v1/dashboard/milestones")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

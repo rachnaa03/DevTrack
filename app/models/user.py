@@ -110,6 +110,20 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # 1:N relationship mapping pointing to Timeline Events
+    timeline_events: Mapped[list["TimelineEvent"]] = relationship(
+        "TimelineEvent",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # 1:N relationship mapping pointing to Milestones
+    milestones: Mapped[list["Milestone"]] = relationship(
+        "Milestone",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_users_email", "email", unique=True),
     )

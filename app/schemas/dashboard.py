@@ -157,3 +157,50 @@ class DashboardChartsResponse(BaseModel):
     interval_days: int
     history: list[DashboardChartPointSchema]
 
+
+# ---------------------------------------------------------------------------
+# Timeline Events block (Task 12.3)
+# ---------------------------------------------------------------------------
+
+class TimelineEventSchema(BaseModel):
+    """
+    Single progression event on the developer timeline (API_SPECIFICATION.md Section 4.3).
+    """
+
+    event_date: date
+    event_type: str
+    title: str
+    description: str | None = None
+
+
+class TimelineEventsResponse(BaseModel):
+    """
+    Response schema for GET /api/v1/dashboard/timeline (API_SPECIFICATION.md Section 4.3).
+    """
+
+    events: list[TimelineEventSchema]
+
+
+# ---------------------------------------------------------------------------
+# Milestone Badges block (Task 12.3)
+# ---------------------------------------------------------------------------
+
+class MilestoneSchema(BaseModel):
+    """
+    Single earned milestone badge (API_SPECIFICATION.md Section 4.4).
+    """
+
+    name: str
+    description: str | None = None
+    badge_url: str | None = None
+    achieved_at: datetime
+
+
+class MilestonesResponse(BaseModel):
+    """
+    Response schema for GET /api/v1/dashboard/milestones (API_SPECIFICATION.md Section 4.4).
+    """
+
+    milestones: list[MilestoneSchema]
+
+
