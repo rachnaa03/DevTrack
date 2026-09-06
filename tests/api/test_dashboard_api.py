@@ -1,12 +1,22 @@
 """
-Integration tests for the Dashboard Summary API endpoint (Task 12.1).
+Integration tests for Dashboard API endpoints (Tasks 12.1 & 12.2).
 
 Tests:
+Summary:
 - GET /api/v1/dashboard/summary (200 OK — full data)
 - GET /api/v1/dashboard/summary (200 OK — partial data / null platform stats)
 - GET /api/v1/dashboard/summary (404 Not Found — no DeveloperScore)
 - GET /api/v1/dashboard/summary (401 Unauthorized — missing/invalid token)
-- User ownership: verifies data returned corresponds strictly to the authenticated user
+
+Charts:
+- GET /api/v1/dashboard/charts (200 OK — default days=30)
+- GET /api/v1/dashboard/charts (200 OK — custom days parameter)
+- GET /api/v1/dashboard/charts (200 OK — empty dataset)
+- GET /api/v1/dashboard/charts (401 Unauthorized — missing token)
+- GET /api/v1/dashboard/charts (422 Unprocessable Content — invalid days filter)
+
+User ownership:
+- Verifies authenticated user ID is passed to services for isolation.
 """
 
 import uuid
@@ -17,18 +27,24 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from app.api.dashboard.routes import get_dashboard_summary_service
+from app.api.dashboard.routes import (
+    get_dashboard_chart_service,
+    get_dashboard_summary_service,
+)
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
 from app.main import app
 from app.models.user import User
 from app.schemas.dashboard import (
+    DashboardChartPointSchema,
+    DashboardChartsResponse,
     DashboardGitHubStatsSchema,
     DashboardLeetCodeStatsSchema,
     DashboardScoreSchema,
     DashboardStatsSchema,
     DashboardSummaryResponse,
 )
+from app.services.dashboard.charts import DashboardChartService
 from app.services.dashboard.summary import DashboardSummaryService
 
 client = TestClient(app)
@@ -77,6 +93,29 @@ def sample_summary_response() -> DashboardSummaryResponse:
         ),
     )
 
+
+@pytest.fixture
+def sample_charts_response() -> DashboardChartsResponse:
+    return DashboardChartsResponse(
+        interval_days=30,
+        history=[
+            DashboardChartPointSchema(
+                date=date(2026, 8, 2),
+                commits=5,
+                problems_solved=2,
+            ),
+            DashboardChartPointSchema(
+                date=date(2026, 8, 3),
+                commits=3,
+                problems_solved=1,
+            ),
+        ],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Task 12.1 — Summary Endpoint Tests
+# ---------------------------------------------------------------------------
 
 def test_get_dashboard_summary_success(
     mock_user: User, sample_summary_response: DashboardSummaryResponse
@@ -181,6 +220,111 @@ def test_get_dashboard_summary_not_found(mock_user: User) -> None:
 
 def test_get_dashboard_summary_unauthorized() -> None:
     """Verify GET /api/v1/dashboard/summary returns 401 when no auth header is provided."""
-    # Ensure no dependency override for get_current_user
     response = client.get("/api/v1/dashboard/summary")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+# ---------------------------------------------------------------------------
+# Task 12.2 — Historical Charts Endpoint Tests
+# ---------------------------------------------------------------------------
+
+def test_get_dashboard_charts_success_default(
+    mock_user: User, sample_charts_response: DashboardChartsResponse
+) -> None:
+    """Verify GET /api/v1/dashboard/charts returns 200 OK with default 30-day range."""
+    mock_service = MagicMock(spec=DashboardChartService)
+    mock_service.get_historical_charts = AsyncMock(return_value=sample_charts_response)
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_dashboard_chart_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/charts")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert data["interval_days"] == 30
+        assert len(data["history"]) == 2
+        assert data["history"][0]["date"] == "2026-08-02"
+        assert data["history"][0]["commits"] == 5
+        assert data["history"][0]["problems_solved"] == 2
+
+        mock_service.get_historical_charts.assert_awaited_once_with(
+            user_id=mock_user.id, days=30
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_charts_custom_days(
+    mock_user: User, sample_charts_response: DashboardChartsResponse
+) -> None:
+    """Verify GET /api/v1/dashboard/charts respects custom days query parameter."""
+    mock_service = MagicMock(spec=DashboardChartService)
+    custom_response = DashboardChartsResponse(
+        interval_days=90,
+        history=sample_charts_response.history,
+    )
+    mock_service.get_historical_charts = AsyncMock(return_value=custom_response)
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_dashboard_chart_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/charts?days=90")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert data["interval_days"] == 90
+        mock_service.get_historical_charts.assert_awaited_once_with(
+            user_id=mock_user.id, days=90
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_charts_empty_data(mock_user: User) -> None:
+    """Verify GET /api/v1/dashboard/charts handles empty historical series gracefully."""
+    mock_service = MagicMock(spec=DashboardChartService)
+    mock_service.get_historical_charts = AsyncMock(
+        return_value=DashboardChartsResponse(interval_days=30, history=[])
+    )
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_dashboard_chart_service] = lambda: mock_service
+
+    try:
+        response = client.get("/api/v1/dashboard/charts")
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert data["interval_days"] == 30
+        assert data["history"] == []
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_get_dashboard_charts_unauthorized() -> None:
+    """Verify GET /api/v1/dashboard/charts returns 401 when no auth header is provided."""
+    response = client.get("/api/v1/dashboard/charts")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_get_dashboard_charts_invalid_days_range(mock_user: User) -> None:
+    """Verify query parameter validation rejects out-of-bound values with 422."""
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+
+    try:
+        # days < 1
+        res_zero = client.get("/api/v1/dashboard/charts?days=0")
+        assert res_zero.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+        # days > 365
+        res_large = client.get("/api/v1/dashboard/charts?days=500")
+        assert res_large.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+        # non-integer
+        res_invalid = client.get("/api/v1/dashboard/charts?days=abc")
+        assert res_invalid.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    finally:
+        app.dependency_overrides.clear()

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented authenticated Historical Charts API endpoint `GET /api/v1/dashboard/charts` returning daily chronological time series of GitHub commits and LeetCode problems solved with configurable lookback interval filter.
+- Created typed Pydantic response models in `app/schemas/dashboard.py` (`DashboardChartPointSchema`, `DashboardChartsResponse`) formatting multi-platform metrics cleanly for frontend charts.
+- Implemented `DashboardChartService` in `app/services/dashboard/charts.py` querying and merging time-series records from `GitHubHistoryRepository` and `LeetCodeHistoryRepository`.
+- Added pure unit tests in `tests/services/dashboard/test_dashboard_charts.py` and integration tests in `tests/api/test_dashboard_api.py` covering custom ranges, empty histories, disjoint dates, and query parameter constraints.
 - Implemented authenticated Dashboard Summary API endpoint `GET /api/v1/dashboard/summary` providing unified Developer Score metrics and platform statistics for GitHub and LeetCode.
 - Created typed Pydantic response models in `app/schemas/dashboard.py` (`DashboardSummaryResponse`, `DashboardScoreSchema`, `DashboardStatsSchema`, `DashboardGitHubStatsSchema`, `DashboardLeetCodeStatsSchema`) ensuring null-safe representations of unpopulated platforms.
 - Implemented read-only `DashboardSummaryService` in `app/services/dashboard/summary.py` assembling latest Developer Score, GitHub, and LeetCode analytics without mutating state or duplicating business calculations.

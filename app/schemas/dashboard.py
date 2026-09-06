@@ -128,3 +128,32 @@ class DashboardSummaryResponse(BaseModel):
 
     developer_score: DashboardScoreSchema
     stats: DashboardStatsSchema
+
+
+# ---------------------------------------------------------------------------
+# Historical Charts block (Task 12.2)
+# ---------------------------------------------------------------------------
+
+class DashboardChartPointSchema(BaseModel):
+    """
+    Single data point in the historical chart series (API_SPECIFICATION.md Section 4.2).
+
+    Represents daily counts for commits and problems solved on a specific date.
+    Fields are nullable if a platform has no recorded activity or snapshot on that date.
+    """
+
+    date: date
+    commits: int | None = None
+    problems_solved: int | None = None
+
+
+class DashboardChartsResponse(BaseModel):
+    """
+    Response schema for GET /api/v1/dashboard/charts (API_SPECIFICATION.md Section 4.2).
+
+    Provides chronological daily history points for frontend chart rendering.
+    """
+
+    interval_days: int
+    history: list[DashboardChartPointSchema]
+
