@@ -50,7 +50,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 11.3** | Completed | Create Recommendation Orchestrator Service | `41bdc3d` | Implemented RecommendationRepository, RecommendationService with idempotency and stale-resolution, RecommendationRunResultSchema, and 28 unit tests. |
 | **Task 12.1** | Completed | Implement Dashboard Summary API Endpoint | `be624b8` | Implemented GET /api/v1/dashboard/summary endpoint, Pydantic schemas, DashboardSummaryService orchestration, and full test suite. |
 | **Task 12.2** | Completed | Implement Historical Charts APIs | `8314767` | Implemented GET /api/v1/dashboard/charts endpoint, Pydantic schemas, DashboardChartService history aggregation, and unit/integration tests. |
-| **Task 12.3** | Pending | Implement Milestone Badges and Timeline Endpoints | *Pending* | |
+| **Task 12.3** | Completed | Implement Milestone Badges and Timeline Endpoints | `cbfec07` | Implemented TimelineEvent & Milestone models, Alembic migration, repositories, MilestoneEvaluator/Service, TimelineService, endpoints, and 354 tests. |
 | **Task 13.1** | Pending | Integrate APScheduler in FastAPI Lifespan | *Pending* | |
 | **Task 13.2** | Pending | Implement Synchronizer Orchestrator Workflow | *Pending* | |
 | **Task 13.3** | Pending | Add Sync Retries, Backoffs, and Error logging | *Pending* | |
