@@ -169,6 +169,30 @@ class SchedulerManager:
             logger.exception("Error during APScheduler shutdown")
             raise exc
 
+    def register_sync_job(self, job_func: Any = None) -> Any:
+        """
+        Register the recurring developer data synchronization job in APScheduler.
+
+        :param job_func: Async callable to execute. If None, lazily imports
+                         `run_scheduled_sync` from `app.services.scheduler.orchestrator`.
+        """
+        if job_func is None:
+            from app.services.scheduler.orchestrator import run_scheduled_sync
+
+            job_func = run_scheduled_sync
+
+        return self.get_scheduler().add_job(
+            func=job_func,
+            trigger="interval",
+            hours=settings.SYNC_INTERVAL_HOURS,
+            id="periodic_developer_sync",
+            name="Periodic Developer Data Synchronization",
+            replace_existing=True,
+            coalesce=True,
+            max_instances=1,
+        )
+
 
 # Singleton instance for application lifecycle integration
 scheduler_manager = SchedulerManager()
+

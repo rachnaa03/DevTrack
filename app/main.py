@@ -36,9 +36,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         },
     )
     scheduler_manager.start()
+    scheduler_manager.register_sync_job()
     yield
     scheduler_manager.shutdown(wait=False)
     logger.info("DevTrack API shutting down")
+
 
 
 # 3. FastAPI Application Instance

@@ -8,7 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `SyncOrchestrator` in `app/services/scheduler/orchestrator.py` providing a coordinated 7-stage periodic synchronization pipeline (platform sync, daily history population, analytics calculation & persistence, developer score recording, insight delta generation, recommendation evaluation, and milestone/timeline awarding).
+- Added `get_connected_user_ids` query to `ProfileRepository` in `app/repositories/profile.py` retrieving developer UUIDs with connected GitHub/LeetCode accounts.
+- Implemented strict per-user database session isolation using `AsyncSessionLocal` within `sync_user` to prevent cross-user transaction failure cascades.
+- Designed minimal typed Pydantic summary schemas `UserSyncSummary` and `BatchSyncSummary` in `app/schemas/sync_orchestrator.py`.
+- Added `register_sync_job` method to `SchedulerManager` in `app/services/scheduler/manager.py` and registered `periodic_developer_sync` interval job in FastAPI `lifespan` in `app/main.py`.
+- Added comprehensive unit and integration tests in `tests/services/scheduler/test_sync_orchestrator.py` covering multi-platform sync, single-platform sync, platform error isolation, empty profiles, batch failure isolation, and APScheduler registration.
 - Integrated APScheduler 3.x `AsyncIOScheduler` into FastAPI application `lifespan` in `app/main.py` with structured startup and shutdown logging.
+
 - Created `SchedulerManager` in `app/services/scheduler/manager.py` with PostgreSQL persistent `SQLAlchemyJobStore` (`apscheduler_jobs` table) for development/production and `MemoryJobStore` for testing.
 - Added synchronous PostgreSQL driver dependency `psycopg2-binary` to `requirements.txt` to isolate APScheduler's sync job store connection from the primary async application engine.
 - Added comprehensive unit and lifecycle tests in `tests/services/scheduler/test_scheduler_manager.py` covering job store selection, state transitions, double-start/shutdown safety, and FastAPI lifespan integration.

@@ -26,3 +26,17 @@ class ProfileRepository:
         await self.db.commit()
         await self.db.refresh(profile)
         return profile
+
+    async def get_connected_user_ids(self) -> list[UUID]:
+        """Retrieve user UUIDs for all profiles that have at least one connected platform handle."""
+        from sqlalchemy import and_, or_
+
+        stmt = select(Profile.user_id).filter(
+            or_(
+                and_(Profile.github_username.isnot(None), Profile.github_username != ""),
+                and_(Profile.leetcode_username.isnot(None), Profile.leetcode_username != ""),
+            )
+        )
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+
