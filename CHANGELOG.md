@@ -8,7 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented asynchronous retry controller `execute_with_retry` and transient error classifier `is_retryable_exception` in `app/services/scheduler/retry.py`.
+- Added configurable retry parameters `SYNC_MAX_RETRIES` (3), `SYNC_RETRY_BASE_DELAY_SECONDS` (1.0s), and `SYNC_RETRY_BACKOFF_FACTOR` (2.0) in `app/core/config.py`.
+- Integrated transient error retry handling and exponential backoff into `SyncOrchestrator` in `app/services/scheduler/orchestrator.py` for both GitHub and LeetCode sync operations.
+- Added structured JSON logging on retry (`sync_retry`) and permanent failure (`sync_failure_permanent`) events with comprehensive context while omitting sensitive credentials/payloads.
+- Created unit and integration tests in `tests/services/scheduler/test_retry.py` and `tests/services/scheduler/test_sync_orchestrator.py` covering retry recovery, exhaustion, non-retryable exceptions, and non-blocking backoff.
 - Implemented `SyncOrchestrator` in `app/services/scheduler/orchestrator.py` providing a coordinated 7-stage periodic synchronization pipeline (platform sync, daily history population, analytics calculation & persistence, developer score recording, insight delta generation, recommendation evaluation, and milestone/timeline awarding).
+
 - Added `get_connected_user_ids` query to `ProfileRepository` in `app/repositories/profile.py` retrieving developer UUIDs with connected GitHub/LeetCode accounts.
 - Implemented strict per-user database session isolation using `AsyncSessionLocal` within `sync_user` to prevent cross-user transaction failure cascades.
 - Designed minimal typed Pydantic summary schemas `UserSyncSummary` and `BatchSyncSummary` in `app/schemas/sync_orchestrator.py`.

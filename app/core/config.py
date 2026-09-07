@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     LEETCODE_RATE_LIMIT_PERIOD: float = 3600.0
     
     SYNC_INTERVAL_HOURS: int = 12
+    SYNC_MAX_RETRIES: int = 3
+    SYNC_RETRY_BASE_DELAY_SECONDS: float = 1.0
+    SYNC_RETRY_BACKOFF_FACTOR: float = 2.0
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

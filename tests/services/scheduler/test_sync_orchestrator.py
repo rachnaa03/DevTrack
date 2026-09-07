@@ -33,6 +33,8 @@ from app.schemas.recommendation_result import RecommendationRunResultSchema
 from app.schemas.sync import GitHubSyncResult, LeetCodeSyncResult
 from app.services.scheduler.manager import SchedulerManager
 from app.services.scheduler.orchestrator import SyncOrchestrator, run_scheduled_sync
+from app.utils.exceptions import PlatformTransientException
+
 
 
 @pytest.fixture
@@ -531,3 +533,68 @@ async def test_run_scheduled_sync_entrypoint() -> None:
         res = await run_scheduled_sync()
         mock_sync_all.assert_called_once()
         assert res.total_users == 0
+
+
+@pytest.mark.asyncio
+async def test_sync_user_github_retry_recovery(
+    sample_gh_analysis: GitHubAnalysisResultSchema,
+) -> None:
+    """Verify GitHub transient failure recovers on retry inside orchestrator sync_user."""
+    user_id = uuid4()
+    profile = Profile(user_id=user_id, github_username="octocat", leetcode_username=None)
+
+    mock_session = AsyncMock()
+    mock_gh_snap = MagicMock(
+        raw_data={"profile": {"id": 1, "login": "octocat"}, "repositories": []}
+    )
+
+    with patch("app.services.scheduler.orchestrator.AsyncSessionLocal") as mock_session_local, \
+         patch("app.services.scheduler.orchestrator.ProfileRepository") as mock_prof_repo_cls, \
+         patch("app.services.scheduler.orchestrator.GitHubSyncService") as mock_gh_sync_cls, \
+         patch("app.services.scheduler.orchestrator.GitHubSnapshotRepository") as mock_gh_snap_repo_cls, \
+         patch("app.services.scheduler.orchestrator.GitHubHistoryRepository") as mock_gh_hist_repo_cls, \
+         patch("app.services.scheduler.orchestrator.GitHubAnalyzer") as mock_gh_analyzer_cls, \
+         patch("app.services.scheduler.orchestrator.GitHubAnalyticsRepository") as mock_gh_an_repo_cls, \
+         patch("app.services.scheduler.orchestrator.DeveloperScoreRepository") as mock_score_repo_cls, \
+         patch("app.services.scheduler.orchestrator.DeveloperScoreService") as mock_score_service_cls, \
+         patch("app.services.scheduler.orchestrator.InsightGenerationService") as mock_insight_service_cls, \
+         patch("app.services.scheduler.orchestrator.RecommendationService") as mock_rec_service_cls, \
+         patch("app.services.scheduler.orchestrator.MilestoneService") as mock_ms_service_cls, \
+         patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+
+        mock_session_local.return_value.__aenter__.return_value = mock_session
+        mock_score_repo_cls.return_value.get_history = AsyncMock(return_value=[])
+        mock_prof_repo_cls.return_value.get_by_user_id = AsyncMock(return_value=profile)
+
+        # First call fails with transient error, second call succeeds
+        mock_gh_sync_cls.return_value.sync_github_data = AsyncMock(
+            side_effect=[
+                PlatformTransientException(platform="GitHub", message="503 Unavailable"),
+                GitHubSyncResult(
+                    success=True,
+                    timestamp=datetime.now(timezone.utc),
+                    github_username="octocat",
+                    repositories_fetched=0,
+                    repositories_parsed=0,
+                    profile_updated=False,
+                ),
+            ]
+        )
+        mock_gh_snap_repo_cls.return_value.get_latest_by_user_id = AsyncMock(return_value=mock_gh_snap)
+        mock_gh_hist_repo_cls.return_value.create_or_update = AsyncMock()
+        mock_gh_analyzer_cls.return_value.analyze = AsyncMock(return_value=sample_gh_analysis)
+        mock_gh_an_repo_cls.return_value.create_or_update = AsyncMock()
+        mock_score_service_cls.return_value.record_score = AsyncMock()
+        mock_insight_service_cls.return_value.generate_and_persist = AsyncMock(return_value=[])
+        mock_rec_service_cls.return_value.generate_and_persist = AsyncMock()
+        mock_ms_service_cls.return_value.get_milestones = AsyncMock()
+
+        orchestrator = SyncOrchestrator()
+        result = await orchestrator.sync_user(user_id=user_id)
+
+        assert result.success is True
+        assert result.github_synced is True
+        assert len(result.errors) == 0
+        assert mock_gh_sync_cls.return_value.sync_github_data.call_count == 2
+        mock_sleep.assert_called_once_with(1.0)
+

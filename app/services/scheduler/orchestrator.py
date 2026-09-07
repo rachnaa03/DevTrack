@@ -46,8 +46,10 @@ from app.services.integrations.leetcode import LeetCodeClient
 from app.services.integrations.leetcode_parser import LeetCodeDataParser
 from app.services.integrations.leetcode_sync import LeetCodeSyncService
 from app.services.recommendations.service import RecommendationService
+from app.services.scheduler.retry import execute_with_retry
 from app.services.scoring.calculator import DeveloperScoreCalculator
 from app.services.scoring.service import DeveloperScoreService
+
 
 logger = logging.getLogger("devtrack.sync_orchestrator")
 
@@ -136,9 +138,13 @@ class SyncOrchestrator:
                 # ===========================================================
                 if has_gh:
                     try:
-                        # Stage 1: Platform Synchronization
+                        # Stage 1: Platform Synchronization (with transient retries & exponential backoff)
                         logger.info("Starting GitHub sync for user_id=%s", user_id)
-                        gh_sync_res = await gh_sync_service.sync_github_data(user_id)
+                        gh_sync_res = await execute_with_retry(
+                            operation=lambda: gh_sync_service.sync_github_data(user_id),
+                            platform="GitHub",
+                            user_id=user_id,
+                        )
                         summary.github_synced = gh_sync_res.success
 
                         # Stage 2: Daily History Population
@@ -172,10 +178,15 @@ class SyncOrchestrator:
                 # ===========================================================
                 if has_lc:
                     try:
-                        # Stage 1: Platform Synchronization
+                        # Stage 1: Platform Synchronization (with transient retries & exponential backoff)
                         logger.info("Starting LeetCode sync for user_id=%s", user_id)
-                        lc_sync_res = await lc_sync_service.sync_leetcode_data(user_id)
+                        lc_sync_res = await execute_with_retry(
+                            operation=lambda: lc_sync_service.sync_leetcode_data(user_id),
+                            platform="LeetCode",
+                            user_id=user_id,
+                        )
                         summary.leetcode_synced = lc_sync_res.success
+
 
                         # Stage 2: Daily History Population
                         latest_lc_snap = await lc_snapshot_repo.get_latest_by_user_id(user_id)
