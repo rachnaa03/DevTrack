@@ -8,7 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented persistent synchronization execution tracking in PostgreSQL with `SyncJob` SQLAlchemy 2.0 ORM model in `app/models/sync_job.py` and Alembic schema migration `c4d5e6f7a8b9_create_sync_jobs_table.py`.
+- Implemented `SyncJobRepository` in `app/repositories/sync_job.py` providing transactional lifecycle methods (`create_sync_job`, `update_sync_job_completion`, `get_latest_sync_job`, `get_running_sync_job`, `get_by_id`, `list_sync_jobs`).
+- Created typed Pydantic v2 schemas `SyncJobSchema`, `SyncStatusResponse`, and `SyncHealthResponse` in `app/schemas/sync_status.py`.
+- Implemented `SyncStatusService` in `app/services/scheduler/status_service.py` decoupling scheduler operational states from synchronization execution states and establishing deterministic health evaluation rules.
+- Integrated `SyncJob` persistence lifecycle into `run_scheduled_sync()` in `app/services/scheduler/orchestrator.py` recording start, user completion metrics, status transitions, and sanitized error summaries.
+- Implemented authenticated Sync Status endpoint `GET /api/v1/sync/status` (requiring JWT `get_current_user`) and public Sync Health endpoint `GET /api/v1/sync/health` in `app/api/sync/routes.py`, registered under prefix `/api/v1/sync` in `app/main.py`.
+- Added 23 unit and integration tests across `tests/repositories/test_sync_job.py`, `tests/services/scheduler/test_status_service.py`, `tests/services/scheduler/test_sync_orchestrator.py`, and `tests/api/test_sync_api.py`.
 - Implemented asynchronous retry controller `execute_with_retry` and transient error classifier `is_retryable_exception` in `app/services/scheduler/retry.py`.
+
 - Added configurable retry parameters `SYNC_MAX_RETRIES` (3), `SYNC_RETRY_BASE_DELAY_SECONDS` (1.0s), and `SYNC_RETRY_BACKOFF_FACTOR` (2.0) in `app/core/config.py`.
 - Integrated transient error retry handling and exponential backoff into `SyncOrchestrator` in `app/services/scheduler/orchestrator.py` for both GitHub and LeetCode sync operations.
 - Added structured JSON logging on retry (`sync_retry`) and permanent failure (`sync_failure_permanent`) events with comprehensive context while omitting sensitive credentials/payloads.

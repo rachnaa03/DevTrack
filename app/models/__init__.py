@@ -11,6 +11,7 @@ from app.models.insight import Insight
 from app.models.recommendation import Recommendation
 from app.models.timeline_event import TimelineEvent
 from app.models.milestone import Milestone
+from app.models.sync_job import SyncJob
 
 __all__ = [
     "User",
@@ -26,4 +27,6 @@ __all__ = [
     "Recommendation",
     "TimelineEvent",
     "Milestone",
+    "SyncJob",
 ]
+

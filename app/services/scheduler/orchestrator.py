@@ -15,7 +15,7 @@ Executes 7 coordinated stages per user in isolated database sessions:
 """
 
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
 
 from app.core.database import AsyncSessionLocal
@@ -30,10 +30,12 @@ from app.repositories.milestone import MilestoneRepository
 from app.repositories.profile import ProfileRepository
 from app.repositories.recommendation import RecommendationRepository
 from app.repositories.score import DeveloperScoreRepository
+from app.repositories.sync_job import SyncJobRepository
 from app.repositories.timeline import TimelineRepository
 from app.schemas.github_analysis import GitHubAnalysisResultSchema
 from app.schemas.leetcode_analysis import LeetCodeAnalysisResultSchema
 from app.schemas.score import DeveloperScoreResultSchema
+
 from app.schemas.sync_orchestrator import BatchSyncSummary, UserSyncSummary
 from app.services.analytics.github import GitHubAnalyzer
 from app.services.analytics.leetcode import LeetCodeAnalyzer
@@ -381,10 +383,96 @@ class SyncOrchestrator:
         return batch_summary
 
 
+def _sanitize_error_message(error: str) -> str:
+    """Sanitize error messages to prevent leaking secrets, credentials, or oversized traces."""
+    cleaned = str(error).replace("\n", " ").strip()
+    if len(cleaned) > 200:
+        cleaned = cleaned[:197] + "..."
+    return cleaned
+
+
 async def run_scheduled_sync() -> BatchSyncSummary:
     """
     Top-level entry point called by APScheduler for periodic synchronization.
+    Tracks execution lifecycle, status, and summary in persistent SyncJob storage.
     """
     logger.info("APScheduler triggered periodic developer synchronization workflow.")
+
+    sync_job_id: UUID | None = None
+    start_time = datetime.now(timezone.utc)
+
+    # 1. Record SyncJob with status 'running'
+    try:
+        async with AsyncSessionLocal() as session:
+            repo = SyncJobRepository(session)
+            job = await repo.create_sync_job(started_at=start_time)
+            sync_job_id = job.id
+    except Exception as exc:
+        logger.exception("Failed to initialize SyncJob record: %s", exc)
+
     orchestrator = SyncOrchestrator()
-    return await orchestrator.sync_all_users()
+    try:
+        batch_summary = await orchestrator.sync_all_users()
+        completed_time = datetime.now(timezone.utc)
+
+        total = batch_summary.total_users
+        success_cnt = batch_summary.successful_users
+        failed_cnt = batch_summary.failed_users
+        skipped_cnt = batch_summary.skipped_users
+
+        if failed_cnt == 0:
+            final_status = "success"
+        elif success_cnt > 0 and failed_cnt > 0:
+            final_status = "partial_failure"
+        else:
+            final_status = "failed" if total > 0 else "success"
+
+        error_summary: str | None = None
+        if failed_cnt > 0:
+            error_list = []
+            for u in batch_summary.user_summaries:
+                if u.errors:
+                    for err in u.errors:
+                        error_list.append(f"User {u.user_id}: {_sanitize_error_message(err)}")
+            if error_list:
+                error_summary = "; ".join(error_list[:10])
+                if len(error_list) > 10:
+                    error_summary += f" ... ({len(error_list) - 10} more errors)"
+
+        if sync_job_id is not None:
+            async with AsyncSessionLocal() as session:
+                repo = SyncJobRepository(session)
+                await repo.update_sync_job_completion(
+                    sync_job_id=sync_job_id,
+                    status=final_status,
+                    completed_at=completed_time,
+                    total_users=total,
+                    successful_users=success_cnt,
+                    failed_users=failed_cnt,
+                    skipped_users=skipped_cnt,
+                    error_summary=error_summary,
+                )
+
+        return batch_summary
+
+    except Exception as fatal_exc:
+        logger.exception("Fatal unhandled exception during scheduled synchronization: %s", fatal_exc)
+        if sync_job_id is not None:
+            try:
+                completed_time = datetime.now(timezone.utc)
+                async with AsyncSessionLocal() as session:
+                    repo = SyncJobRepository(session)
+                    await repo.update_sync_job_completion(
+                        sync_job_id=sync_job_id,
+                        status="failed",
+                        completed_at=completed_time,
+                        total_users=0,
+                        successful_users=0,
+                        failed_users=0,
+                        skipped_users=0,
+                        error_summary=f"Fatal unhandled error: {_sanitize_error_message(str(fatal_exc))}",
+                    )
+            except Exception as update_exc:
+                logger.exception("Failed to update SyncJob on fatal error: %s", update_exc)
+        raise fatal_exc
+

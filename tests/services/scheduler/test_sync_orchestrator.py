@@ -31,9 +31,11 @@ from app.schemas.leetcode_analysis import (
 )
 from app.schemas.recommendation_result import RecommendationRunResultSchema
 from app.schemas.sync import GitHubSyncResult, LeetCodeSyncResult
+from app.schemas.sync_orchestrator import BatchSyncSummary, UserSyncSummary
 from app.services.scheduler.manager import SchedulerManager
 from app.services.scheduler.orchestrator import SyncOrchestrator, run_scheduled_sync
 from app.utils.exceptions import PlatformTransientException
+
 
 
 
@@ -527,12 +529,92 @@ async def test_scheduler_job_registration() -> None:
 
 @pytest.mark.asyncio
 async def test_run_scheduled_sync_entrypoint() -> None:
-    """Verify run_scheduled_sync delegates to SyncOrchestrator.sync_all_users."""
-    with patch.object(SyncOrchestrator, "sync_all_users", new_callable=AsyncMock) as mock_sync_all:
-        mock_sync_all.return_value = MagicMock(total_users=0)
+    """Verify run_scheduled_sync records SyncJob lifecycle and delegates to sync_all_users."""
+    mock_batch = BatchSyncSummary(
+        total_users=2,
+        successful_users=2,
+        failed_users=0,
+        skipped_users=0,
+    )
+    mock_created_job = MagicMock(id=uuid4())
+
+    with patch("app.services.scheduler.orchestrator.AsyncSessionLocal") as mock_session_local, \
+         patch("app.services.scheduler.orchestrator.SyncJobRepository") as mock_repo_cls, \
+         patch.object(SyncOrchestrator, "sync_all_users", new_callable=AsyncMock) as mock_sync_all:
+
+        mock_session_local.return_value.__aenter__.return_value = AsyncMock()
+        mock_repo_cls.return_value.create_sync_job = AsyncMock(return_value=mock_created_job)
+        mock_repo_cls.return_value.update_sync_job_completion = AsyncMock()
+        mock_sync_all.return_value = mock_batch
+
         res = await run_scheduled_sync()
+
         mock_sync_all.assert_called_once()
-        assert res.total_users == 0
+        assert res.total_users == 2
+        mock_repo_cls.return_value.create_sync_job.assert_called_once()
+        mock_repo_cls.return_value.update_sync_job_completion.assert_called_once()
+        _, kwargs = mock_repo_cls.return_value.update_sync_job_completion.call_args
+        assert kwargs["status"] == "success"
+        assert kwargs["total_users"] == 2
+        assert kwargs["successful_users"] == 2
+        assert kwargs["failed_users"] == 0
+
+
+@pytest.mark.asyncio
+async def test_run_scheduled_sync_partial_failure_lifecycle() -> None:
+    """Verify run_scheduled_sync transitions to partial_failure and sanitizes error messages."""
+    uid = uuid4()
+    mock_batch = BatchSyncSummary(
+        total_users=2,
+        successful_users=1,
+        failed_users=1,
+        skipped_users=0,
+        user_summaries=[
+            UserSyncSummary(user_id=uid, success=False, errors=["GitHub: 500 Server Error http://secret.internal/token"]),
+        ],
+    )
+    mock_created_job = MagicMock(id=uuid4())
+
+    with patch("app.services.scheduler.orchestrator.AsyncSessionLocal") as mock_session_local, \
+         patch("app.services.scheduler.orchestrator.SyncJobRepository") as mock_repo_cls, \
+         patch.object(SyncOrchestrator, "sync_all_users", new_callable=AsyncMock) as mock_sync_all:
+
+        mock_session_local.return_value.__aenter__.return_value = AsyncMock()
+        mock_repo_cls.return_value.create_sync_job = AsyncMock(return_value=mock_created_job)
+        mock_repo_cls.return_value.update_sync_job_completion = AsyncMock()
+        mock_sync_all.return_value = mock_batch
+
+        res = await run_scheduled_sync()
+
+        assert res.failed_users == 1
+        _, kwargs = mock_repo_cls.return_value.update_sync_job_completion.call_args
+        assert kwargs["status"] == "partial_failure"
+        assert kwargs["total_users"] == 2
+        assert kwargs["failed_users"] == 1
+        assert "500 Server Error" in kwargs["error_summary"]
+
+
+@pytest.mark.asyncio
+async def test_run_scheduled_sync_fatal_exception_lifecycle() -> None:
+    """Verify fatal unhandled exception marks SyncJob as failed and re-raises exception."""
+    mock_created_job = MagicMock(id=uuid4())
+
+    with patch("app.services.scheduler.orchestrator.AsyncSessionLocal") as mock_session_local, \
+         patch("app.services.scheduler.orchestrator.SyncJobRepository") as mock_repo_cls, \
+         patch.object(SyncOrchestrator, "sync_all_users", new_callable=AsyncMock) as mock_sync_all:
+
+        mock_session_local.return_value.__aenter__.return_value = AsyncMock()
+        mock_repo_cls.return_value.create_sync_job = AsyncMock(return_value=mock_created_job)
+        mock_repo_cls.return_value.update_sync_job_completion = AsyncMock()
+        mock_sync_all.side_effect = RuntimeError("Fatal crash")
+
+        with pytest.raises(RuntimeError, match="Fatal crash"):
+            await run_scheduled_sync()
+
+        _, kwargs = mock_repo_cls.return_value.update_sync_job_completion.call_args
+        assert kwargs["status"] == "failed"
+        assert "Fatal crash" in kwargs["error_summary"]
+
 
 
 @pytest.mark.asyncio
