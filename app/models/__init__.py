@@ -12,6 +12,7 @@ from app.models.recommendation import Recommendation
 from app.models.timeline_event import TimelineEvent
 from app.models.milestone import Milestone
 from app.models.sync_job import SyncJob
+from app.models.weekly_report import WeeklyReport
 
 __all__ = [
     "User",
@@ -28,5 +29,7 @@ __all__ = [
     "TimelineEvent",
     "Milestone",
     "SyncJob",
+    "WeeklyReport",
 ]
+
 

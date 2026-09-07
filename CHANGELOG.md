@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `WeeklyReport` SQLAlchemy 2.0 ORM model in `app/models/weekly_report.py` storing precomputed weekly retrospective summaries, score deltas, and subscore breakdowns in PostgreSQL `JSONB`.
+- Configured bidirectional 1:N relationship between `User` and `WeeklyReport` (`User.weekly_reports` with `cascade="all, delete-orphan"`).
+- Created Alembic database schema migration `d5e6f7a8b9c0_create_weekly_reports_table.py` establishing `weekly_reports` table and unique constraint `uq_weekly_reports_user_week_start`.
+- Added unit tests in `tests/models/test_weekly_report_model.py` covering model attributes, column constraints, relationship mappings, and instantiation.
 - Implemented persistent synchronization execution tracking in PostgreSQL with `SyncJob` SQLAlchemy 2.0 ORM model in `app/models/sync_job.py` and Alembic schema migration `c4d5e6f7a8b9_create_sync_jobs_table.py`.
+
 - Implemented `SyncJobRepository` in `app/repositories/sync_job.py` providing transactional lifecycle methods (`create_sync_job`, `update_sync_job_completion`, `get_latest_sync_job`, `get_running_sync_job`, `get_by_id`, `list_sync_jobs`).
 - Created typed Pydantic v2 schemas `SyncJobSchema`, `SyncStatusResponse`, and `SyncHealthResponse` in `app/schemas/sync_status.py`.
 - Implemented `SyncStatusService` in `app/services/scheduler/status_service.py` decoupling scheduler operational states from synchronization execution states and establishing deterministic health evaluation rules.

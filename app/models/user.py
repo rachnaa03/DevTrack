@@ -124,6 +124,14 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # 1:N relationship mapping pointing to Weekly Reports
+    weekly_reports: Mapped[list["WeeklyReport"]] = relationship(
+        "WeeklyReport",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_users_email", "email", unique=True),
     )
+
