@@ -77,10 +77,9 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Add Sync Retries, Backoffs, and Error Logging (Task 13.3)
 - [x] Implement Sync Status & Health APIs (Task 13.4)
 - [ ] Implement Weekly Retrospective Reports
-
-
-
-
+  - [x] Create Weekly Report Database Model & Migration (Task 14.1)
+  - [x] Implement Weekly Summary Aggregation Logic (Task 14.2)
+  - [ ] Implement Get Weekly Reports Endpoint (Task 14.3)
 
 ### 7. Frontend Dashboard
 - [ ] Initialize React App using Vite

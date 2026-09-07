@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,3 +53,43 @@ class DeveloperScoreRepository:
         )
         result = await self.db.execute(query)
         return list(result.scalars().all())
+
+    async def get_scores_by_date_range(
+        self,
+        user_id: UUID,
+        start_datetime: datetime | None = None,
+        end_datetime: datetime | None = None,
+    ) -> list[DeveloperScore]:
+        """
+        Retrieve chronological score history for a user, optionally filtered by datetime range.
+        Returns results sorted by computed_at in ascending order.
+        """
+        query = select(DeveloperScore).filter(DeveloperScore.user_id == user_id)
+        if start_datetime is not None:
+            query = query.filter(DeveloperScore.computed_at >= start_datetime)
+        if end_datetime is not None:
+            query = query.filter(DeveloperScore.computed_at <= end_datetime)
+        query = query.order_by(DeveloperScore.computed_at.asc())
+
+        result = await self.db.execute(query)
+        return list(result.scalars().all())
+
+    async def get_latest_before(
+        self,
+        user_id: UUID,
+        before_datetime: datetime,
+    ) -> DeveloperScore | None:
+        """
+        Retrieve the latest score calculated before or at the specified datetime.
+        """
+        query = (
+            select(DeveloperScore)
+            .filter(
+                DeveloperScore.user_id == user_id,
+                DeveloperScore.computed_at <= before_datetime,
+            )
+            .order_by(DeveloperScore.computed_at.desc())
+            .limit(1)
+        )
+        result = await self.db.execute(query)
+        return result.scalars().first()

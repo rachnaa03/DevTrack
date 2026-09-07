@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented `WeeklyReportRepository` in `app/repositories/weekly_report.py` with PostgreSQL native upsert on `(user_id, week_start)` for idempotent retrospective persistence and retrieval.
+- Created Pydantic v2 schemas in `app/schemas/reports.py` (`WeeklySubscoresSchema`, `WeeklyReportDataSchema`, `WeeklyReportListItemSchema`, `WeeklyReportResponseSchema`, `WeeklyReportsIndexResponse`).
+- Implemented `WeeklyReportService` in `app/services/reports/summary.py` aggregating GitHub commits, LeetCode net problems solved, Developer Score deltas and subscores over Monday-Sunday week boundaries with deterministic qualitative retrospective summaries.
+- Added unit tests in `tests/repositories/test_weekly_report.py` and `tests/services/reports/test_weekly_summary.py` covering weekly boundaries, multi-platform aggregation, missing historical data, intra-week deltas, and idempotent regeneration.
 - Implemented `WeeklyReport` SQLAlchemy 2.0 ORM model in `app/models/weekly_report.py` storing precomputed weekly retrospective summaries, score deltas, and subscore breakdowns in PostgreSQL `JSONB`.
 - Configured bidirectional 1:N relationship between `User` and `WeeklyReport` (`User.weekly_reports` with `cascade="all, delete-orphan"`).
 - Created Alembic database schema migration `d5e6f7a8b9c0_create_weekly_reports_table.py` establishing `weekly_reports` table and unique constraint `uq_weekly_reports_user_week_start`.

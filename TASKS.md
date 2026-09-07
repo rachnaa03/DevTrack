@@ -56,8 +56,8 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 13.3** | Completed | Add Sync Retries, Backoffs, and Error logging | `38e847c` | Implemented execute_with_retry with exponential backoff (SYNC_MAX_RETRIES=3, SYNC_RETRY_BASE_DELAY_SECONDS=1.0, factor=2.0), transient error classification, structured JSON logging, and 12 unit tests. |
 | **Task 13.4** | Completed | Implement Sync Status & Health APIs | `72776eb` | Implemented persistent SyncJob tracking, SyncJobRepository, SyncStatusService, /api/v1/sync/status and /api/v1/sync/health endpoints, Alembic migration c4d5e6f7a8b9, and 23 unit/integration tests. |
 
-| **Task 14.1** | Completed | Create Weekly Report Database Model & Migration | `Pending` | Implemented WeeklyReport SQLAlchemy model with JSONB payload, User 1:N relationship, Alembic migration d5e6f7a8b9c0, and unit tests. |
-| **Task 14.2** | Pending | Implement Weekly Summary Aggregation Logic | *Pending* | |
+| **Task 14.1** | Completed | Create Weekly Report Database Model & Migration | `02aff6b` | Implemented WeeklyReport SQLAlchemy model with JSONB payload, User 1:N relationship, Alembic migration d5e6f7a8b9c0, and unit tests. |
+| **Task 14.2** | Completed | Implement Weekly Summary Aggregation Logic | `ccc9a41` | Implemented WeeklyReportRepository with PostgreSQL native upsert, WeeklyReportService aggregation logic (commits, problems solved delta, score delta, subscores), Pydantic schemas, and unit tests. |
 | **Task 14.3** | Pending | Implement Get Weekly Reports Endpoint | *Pending* | |
 
 | **Task 15.1** | Pending | Initialize React Application & Asset Setup | *Pending* | |
