@@ -72,7 +72,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
 - [x] Implement Dashboard Summary API Endpoint (Task 12.1)
 - [x] Implement Chart Data Feeds (Task 12.2)
 - [x] Implement Milestone Badges and Timeline Events (Task 12.3)
-- [ ] Integrate APScheduler in FastAPI Lifespan
+- [x] Integrate APScheduler in FastAPI Lifespan (Task 13.1)
 - [ ] Implement Synchronization Job Orchestrator
 - [ ] Implement Weekly Retrospective Reports
 

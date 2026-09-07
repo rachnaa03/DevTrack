@@ -12,8 +12,9 @@ from app.api.dashboard.routes import router as dashboard_router
 from app.api.health import router as health_router
 from app.api.profile.routes import router as profile_router
 from app.core.config import settings
-from app.utils.exceptions import DevTrackException
 from app.core.logging import request_id_ctx, setup_logging
+from app.services.scheduler import scheduler_manager
+from app.utils.exceptions import DevTrackException
 
 # 1. Initialize structured logging configuration
 setup_logging()
@@ -34,7 +35,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             }
         },
     )
+    scheduler_manager.start()
     yield
+    scheduler_manager.shutdown(wait=False)
     logger.info("DevTrack API shutting down")
 
 

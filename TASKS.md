@@ -51,7 +51,7 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 12.1** | Completed | Implement Dashboard Summary API Endpoint | `be624b8` | Implemented GET /api/v1/dashboard/summary endpoint, Pydantic schemas, DashboardSummaryService orchestration, and full test suite. |
 | **Task 12.2** | Completed | Implement Historical Charts APIs | `8314767` | Implemented GET /api/v1/dashboard/charts endpoint, Pydantic schemas, DashboardChartService history aggregation, and unit/integration tests. |
 | **Task 12.3** | Completed | Implement Milestone Badges and Timeline Endpoints | `cbfec07` | Implemented TimelineEvent & Milestone models, Alembic migration, repositories, MilestoneEvaluator/Service, TimelineService, endpoints, and 354 tests. |
-| **Task 13.1** | Pending | Integrate APScheduler in FastAPI Lifespan | *Pending* | |
+| **Task 13.1** | Completed | Integrate APScheduler in FastAPI Lifespan | `edb80b1` | Integrated APScheduler AsyncIOScheduler with PostgreSQL job store in FastAPI lifespan, added psycopg2-binary driver, and unit/integration tests. |
 | **Task 13.2** | Pending | Implement Synchronizer Orchestrator Workflow | *Pending* | |
 | **Task 13.3** | Pending | Add Sync Retries, Backoffs, and Error logging | *Pending* | |
 | **Task 13.4** | Pending | Implement Sync Status & Health APIs | *Pending* | |

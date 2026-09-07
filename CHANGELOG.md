@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Integrated APScheduler 3.x `AsyncIOScheduler` into FastAPI application `lifespan` in `app/main.py` with structured startup and shutdown logging.
+- Created `SchedulerManager` in `app/services/scheduler/manager.py` with PostgreSQL persistent `SQLAlchemyJobStore` (`apscheduler_jobs` table) for development/production and `MemoryJobStore` for testing.
+- Added synchronous PostgreSQL driver dependency `psycopg2-binary` to `requirements.txt` to isolate APScheduler's sync job store connection from the primary async application engine.
+- Added comprehensive unit and lifecycle tests in `tests/services/scheduler/test_scheduler_manager.py` covering job store selection, state transitions, double-start/shutdown safety, and FastAPI lifespan integration.
 - Implemented authenticated Timeline Events endpoint `GET /api/v1/dashboard/timeline` and Milestone Badges endpoint `GET /api/v1/dashboard/milestones`.
 - Designed `TimelineEvent` and `Milestone` SQLAlchemy models in `app/models/timeline_event.py` and `app/models/milestone.py` and generated Alembic database schema migration `b2c3d4e5f6a7_create_timeline_and_milestones_tables.py`.
 - Implemented `TimelineRepository` in `app/repositories/timeline.py` and `MilestoneRepository` in `app/repositories/milestone.py`.
