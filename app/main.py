@@ -11,6 +11,7 @@ from app.api.auth.routes import router as auth_router
 from app.api.dashboard.routes import router as dashboard_router
 from app.api.health import router as health_router
 from app.api.profile.routes import router as profile_router
+from app.api.reports.routes import router as reports_router
 from app.api.sync.routes import router as sync_router
 from app.core.config import settings
 from app.core.logging import request_id_ctx, setup_logging
@@ -124,4 +125,5 @@ app.include_router(auth_router, prefix="/api/v1/auth")
 app.include_router(profile_router, prefix="/api/v1/profile")
 app.include_router(dashboard_router, prefix="/api/v1/dashboard")
 app.include_router(sync_router, prefix="/api/v1/sync")
+app.include_router(reports_router, prefix="/api/v1/reports")
 

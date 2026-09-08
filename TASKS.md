@@ -58,7 +58,7 @@ This document tracks all tasks, their implementation status, associated commit h
 
 | **Task 14.1** | Completed | Create Weekly Report Database Model & Migration | `02aff6b` | Implemented WeeklyReport SQLAlchemy model with JSONB payload, User 1:N relationship, Alembic migration d5e6f7a8b9c0, and unit tests. |
 | **Task 14.2** | Completed | Implement Weekly Summary Aggregation Logic | `ccc9a41` | Implemented WeeklyReportRepository with PostgreSQL native upsert, WeeklyReportService aggregation logic (commits, problems solved delta, score delta, subscores), Pydantic schemas, and unit tests. |
-| **Task 14.3** | Pending | Implement Get Weekly Reports Endpoint | *Pending* | |
+| **Task 14.3** | Completed | Implement Get Weekly Reports Endpoint | `8b0f65f` | Implemented GET /api/v1/reports/weekly and GET /api/v1/reports/weekly/{id} with JWT auth, user isolation, service retrieval methods, and comprehensive test suite. |
 
 | **Task 15.1** | Pending | Initialize React Application & Asset Setup | *Pending* | |
 | **Task 15.2** | Pending | Build Login and Registration UI | *Pending* | |

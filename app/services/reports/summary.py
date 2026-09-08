@@ -237,3 +237,34 @@ class WeeklyReportService:
         )
 
         return persisted_report
+
+    async def get_user_reports_index(
+        self,
+        user_id: UUID,
+        limit: int = 20,
+    ) -> list[WeeklyReport]:
+        """
+        Retrieve chronological weekly reports for a specific user.
+
+        :param user_id: UUID of the user.
+        :param limit: Maximum number of reports to retrieve (clamped between 1 and 100).
+        :return: List of WeeklyReport models sorted by week_start descending.
+        """
+        return await self.weekly_report_repo.get_reports_by_user(user_id=user_id, limit=limit)
+
+    async def get_user_report_by_id(
+        self,
+        user_id: UUID,
+        report_id: UUID,
+    ) -> WeeklyReport | None:
+        """
+        Retrieve a specific weekly report by ID for a user, enforcing ownership isolation.
+
+        :param user_id: UUID of the authenticated user requesting the report.
+        :param report_id: UUID of the report.
+        :return: WeeklyReport instance if found and owned by user, otherwise None.
+        """
+        report = await self.weekly_report_repo.get_by_id(report_id=report_id)
+        if report is None or report.user_id != user_id:
+            return None
+        return report

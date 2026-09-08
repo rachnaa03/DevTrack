@@ -399,3 +399,102 @@ async def test_generate_weekly_report_score_intra_week_delta(
     assert data["weekly_subscores"]["consistency"] == 120
     assert data["weekly_subscores"]["depth"] == 165
     assert data["weekly_subscores"]["impact"] == 165
+
+
+@pytest.mark.asyncio
+async def test_get_user_reports_index(
+    weekly_service: WeeklyReportService,
+    mock_weekly_report_repo: MagicMock,
+) -> None:
+    """Verify get_user_reports_index delegates to repository with limit."""
+    user_id = uuid.uuid4()
+    mock_reports = [
+        WeeklyReport(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            week_start=date(2026, 8, 17),
+            week_end=date(2026, 8, 23),
+            report_data={},
+            created_at=datetime.now(timezone.utc),
+        ),
+        WeeklyReport(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            week_start=date(2026, 8, 10),
+            week_end=date(2026, 8, 16),
+            report_data={},
+            created_at=datetime.now(timezone.utc),
+        ),
+    ]
+    mock_weekly_report_repo.get_reports_by_user.return_value = mock_reports
+
+    result = await weekly_service.get_user_reports_index(user_id=user_id, limit=10)
+
+    assert result == mock_reports
+    mock_weekly_report_repo.get_reports_by_user.assert_called_once_with(user_id=user_id, limit=10)
+
+
+@pytest.mark.asyncio
+async def test_get_user_report_by_id_success(
+    weekly_service: WeeklyReportService,
+    mock_weekly_report_repo: MagicMock,
+) -> None:
+    """Verify get_user_report_by_id returns report when it belongs to user."""
+    user_id = uuid.uuid4()
+    report_id = uuid.uuid4()
+    mock_report = WeeklyReport(
+        id=report_id,
+        user_id=user_id,
+        week_start=date(2026, 8, 17),
+        week_end=date(2026, 8, 23),
+        report_data={"commits_count": 5},
+        created_at=datetime.now(timezone.utc),
+    )
+    mock_weekly_report_repo.get_by_id.return_value = mock_report
+
+    result = await weekly_service.get_user_report_by_id(user_id=user_id, report_id=report_id)
+
+    assert result == mock_report
+    mock_weekly_report_repo.get_by_id.assert_called_once_with(report_id=report_id)
+
+
+@pytest.mark.asyncio
+async def test_get_user_report_by_id_not_found(
+    weekly_service: WeeklyReportService,
+    mock_weekly_report_repo: MagicMock,
+) -> None:
+    """Verify get_user_report_by_id returns None when report does not exist."""
+    user_id = uuid.uuid4()
+    report_id = uuid.uuid4()
+    mock_weekly_report_repo.get_by_id.return_value = None
+
+    result = await weekly_service.get_user_report_by_id(user_id=user_id, report_id=report_id)
+
+    assert result is None
+    mock_weekly_report_repo.get_by_id.assert_called_once_with(report_id=report_id)
+
+
+@pytest.mark.asyncio
+async def test_get_user_report_by_id_wrong_user_returns_none(
+    weekly_service: WeeklyReportService,
+    mock_weekly_report_repo: MagicMock,
+) -> None:
+    """Verify get_user_report_by_id returns None when report belongs to another user (isolation)."""
+    user_id = uuid.uuid4()
+    other_user_id = uuid.uuid4()
+    report_id = uuid.uuid4()
+    mock_report = WeeklyReport(
+        id=report_id,
+        user_id=other_user_id,
+        week_start=date(2026, 8, 17),
+        week_end=date(2026, 8, 23),
+        report_data={"commits_count": 5},
+        created_at=datetime.now(timezone.utc),
+    )
+    mock_weekly_report_repo.get_by_id.return_value = mock_report
+
+    result = await weekly_service.get_user_report_by_id(user_id=user_id, report_id=report_id)
+
+    assert result is None
+    mock_weekly_report_repo.get_by_id.assert_called_once_with(report_id=report_id)
+

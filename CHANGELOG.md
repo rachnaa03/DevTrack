@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Implemented authenticated Weekly Reports API endpoints in `app/api/reports/routes.py`:
+  - `GET /api/v1/reports/weekly` (chronological index listing with configurable `limit` parameter, 1-100, default 20).
+  - `GET /api/v1/reports/weekly/{id}` (complete weekly retrospective report details with user ownership verification and 404 isolation).
+- Integrated `reports_router` under prefix `/api/v1/reports` in `app/main.py`.
+- Added retrieval methods `get_user_reports_index` and `get_user_report_by_id` to `WeeklyReportService` in `app/services/reports/summary.py`.
+- Added comprehensive integration and service tests in `tests/api/test_reports_api.py` and `tests/services/reports/test_weekly_summary.py` covering authentication, custom limits, invalid inputs, user isolation, empty states, and response schemas.
 - Implemented `WeeklyReportRepository` in `app/repositories/weekly_report.py` with PostgreSQL native upsert on `(user_id, week_start)` for idempotent retrospective persistence and retrieval.
 - Created Pydantic v2 schemas in `app/schemas/reports.py` (`WeeklySubscoresSchema`, `WeeklyReportDataSchema`, `WeeklyReportListItemSchema`, `WeeklyReportResponseSchema`, `WeeklyReportsIndexResponse`).
 - Implemented `WeeklyReportService` in `app/services/reports/summary.py` aggregating GitHub commits, LeetCode net problems solved, Developer Score deltas and subscores over Monday-Sunday week boundaries with deterministic qualitative retrospective summaries.
