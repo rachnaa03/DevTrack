@@ -82,7 +82,7 @@ This document tracks the high-level progress of the DevTrack implementation phas
   - [x] Implement Get Weekly Reports Endpoint (Task 14.3)
 
 ### 7. Frontend Dashboard
-- [ ] Initialize React App using Vite
+- [x] Initialize React App using Vite (Task 15.1)
 - [ ] Build Registration & Login Screens
 - [ ] Build Main Layout & Sidebar Navigation
 - [ ] Implement Dashboard Summary Views

@@ -135,3 +135,10 @@ cython_debug/
 # Local env file containing secrets
 .env
 .env.bak
+
+# Frontend node_modules and build dist
+node_modules/
+dist/
+.env.local
+.env.*.local
+

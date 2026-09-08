@@ -55,12 +55,10 @@ This document tracks all tasks, their implementation status, associated commit h
 | **Task 13.2** | Completed | Implement Synchronizer Orchestrator Workflow | `e52ddf8` | Implemented SyncOrchestrator coordinating 7-stage pipeline (sync, history, analytics, score, insights, recs, milestones) with isolated per-user sessions and APScheduler job registration. |
 | **Task 13.3** | Completed | Add Sync Retries, Backoffs, and Error logging | `38e847c` | Implemented execute_with_retry with exponential backoff (SYNC_MAX_RETRIES=3, SYNC_RETRY_BASE_DELAY_SECONDS=1.0, factor=2.0), transient error classification, structured JSON logging, and 12 unit tests. |
 | **Task 13.4** | Completed | Implement Sync Status & Health APIs | `72776eb` | Implemented persistent SyncJob tracking, SyncJobRepository, SyncStatusService, /api/v1/sync/status and /api/v1/sync/health endpoints, Alembic migration c4d5e6f7a8b9, and 23 unit/integration tests. |
-
 | **Task 14.1** | Completed | Create Weekly Report Database Model & Migration | `02aff6b` | Implemented WeeklyReport SQLAlchemy model with JSONB payload, User 1:N relationship, Alembic migration d5e6f7a8b9c0, and unit tests. |
 | **Task 14.2** | Completed | Implement Weekly Summary Aggregation Logic | `ccc9a41` | Implemented WeeklyReportRepository with PostgreSQL native upsert, WeeklyReportService aggregation logic (commits, problems solved delta, score delta, subscores), Pydantic schemas, and unit tests. |
 | **Task 14.3** | Completed | Implement Get Weekly Reports Endpoint | `8b0f65f` | Implemented GET /api/v1/reports/weekly and GET /api/v1/reports/weekly/{id} with JWT auth, user isolation, service retrieval methods, and comprehensive test suite. |
-
-| **Task 15.1** | Pending | Initialize React Application & Asset Setup | *Pending* | |
+| **Task 15.1** | Completed | Initialize React Application & Asset Setup | `8983aea` | Initialized React SPA with Vite, established Vanilla CSS design tokens, centralized Axios API client with auth interceptor, AuthContext shell, common UI primitives, and verified dev proxy to backend. |
 | **Task 15.2** | Pending | Build Login and Registration UI | *Pending* | |
 | **Task 15.3** | Pending | Build Main Layout and Navigation | *Pending* | |
 | **Task 15.4** | Pending | Build Summary Stats Panel | *Pending* | |

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Initialized React Single Page Application (SPA) with Vite in `frontend/` configured with development proxy to the FastAPI backend (`:3000` -> `:8000`).
+- Established Vanilla CSS design tokens and dark-mode-first styling system in `frontend/src/index.css` (custom properties for surfaces, brand accents, typography, glassmorphism cards, buttons, and badges).
+- Implemented centralized Axios REST client in `frontend/src/services/api.js` targeting `/api/v1` with Bearer JWT token request interceptor and 401 handling.
+- Implemented foundational `AuthContext` in `frontend/src/context/AuthContext.jsx` for global authentication state and localStorage synchronization.
+- Created reusable common UI primitives (`Button`, `Card`, `Badge`) in `frontend/src/components/common/`.
+- Created minimal initialization verification page `AppInitView` verifying React mount and live `/api/v1/health` connectivity through the Vite proxy.
+- Created vector brand assets (`favicon.svg` and `logo.svg`).
 - Implemented authenticated Weekly Reports API endpoints in `app/api/reports/routes.py`:
   - `GET /api/v1/reports/weekly` (chronological index listing with configurable `limit` parameter, 1-100, default 20).
   - `GET /api/v1/reports/weekly/{id}` (complete weekly retrospective report details with user ownership verification and 404 isolation).
